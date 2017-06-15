@@ -14,13 +14,18 @@ def encrypt(filename, text, magic):
         hash = pbkdf2_sha256.encrypt(magic, rounds=10000, salt_size=16)
         if pbkdf2_sha256.verify(magic, hash):
             print 'The hash is correctly set\n'
-    
-    # Load image in rgb-array
-    # Least Significant Bit
-    # Encrypt with 'Password:magic', and 'text'
     try:
-        d = load_image( filename )
-        print d
+        # Load Image
+        d_old = load_image( filename )
+
+        # Define end_bit and add to text
+        end = '$'
+        text += end
+
+        # get new data and save to image
+        d_new = change_lsb(text_ascii(text), d_old)
+        save_image(d_new, 'new_'+filename)
+        
     except Exception,e:
         print str(e)
     
@@ -30,16 +35,31 @@ def decrypt(filename, magic):
     # Decrypt with 'Password:magic'
     try:
         d = load_image( filename )
-        print d
     except Exception,e:
         print str(e)
 
 def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
+def ascii_text(byte):
+    return chr(int(ascii, 2))
+
+def retrieve_lsb(data):
+    t = 0
+    l = ''
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            for k in range(3):
+                # Retrieve untill end is found
+                # return text
+                print 'THIS IS NOT FINISHED YET'
+                
 
 def change_lsb(text,data):
     text = ''.join(text)
     t = 0
+    if len(data)*len(data[0])*3 < len(text):
+        print 'Image not big enough'
+        sys.exit(0)
     for i in range(len(data)):
         for j in range(len(data[0])):
             for k in range(3):
@@ -48,9 +68,7 @@ def change_lsb(text,data):
                 data[i][j][k] = data[i][j][k] + int(text[t])
                 t += 1
                 if t >= len(text):
-                    # put end bit
                     return data
-    # if t < len(text), image is not big enough for text
 
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
