@@ -36,7 +36,7 @@ def load_image( filename ) :
     return data
 
 def save_image( npdata, outfilename ) :
-    img = Image.fromarray( np.asarray( np.clip(npdata,0,255), dtype="uint8"), "L" )
+    img = Image.fromarray( np.asarray( np.clip(npdata,0,255), dtype="uint8"), "RGB" )
     img.save( outfilename )
     
 def usage():
