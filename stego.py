@@ -34,6 +34,9 @@ def decrypt(filename, magic):
     except Exception,e:
         print str(e)
 
+def text_ascii(text):
+    return map(lambda x:int(bin(ord(x))[2:]),text)
+
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
     img.load()
