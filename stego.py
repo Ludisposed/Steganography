@@ -11,6 +11,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 def encrypt(filename, text, magic):
     if not magic is None:
+        
         hash = pbkdf2_sha256.encrypt(magic, rounds=10000, salt_size=16)
         if pbkdf2_sha256.verify(magic, hash):
             print 'The hash is correctly set\n'
@@ -49,17 +50,18 @@ def ascii_text(a):
     return chr(int(a, 2))
 
 def retrieve_lsb(d):    
-    l = []
+    l = 0
     out = ''
     for _ in d:
         for i in _:                
             for k in range(3):
                 # incorrect but why .. maybe save method?
                 print i[k] & 1
-                l += [i[k] & 1]
-                if len(l) == 20:
+                l = l * 10 + (i[k] & 1)
+                print l, len(str(l))
+                if l > 1 and len(str(l)) % 7 == 0:
                     print l
-                    return 'lol'
+                    return ascii_text(str(l))
 
 def change_lsb(t,d):
     t = [int(x) for x in ''.join(t)]
