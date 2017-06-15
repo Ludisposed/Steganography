@@ -2,3 +2,8 @@ questions:
 1.how does the magic work, is it a digit from 1 to 7(2 ^ 3 - 1) like the challenge?
 2.if there is no magic, does the bit change from the first pix?
 3.the message only contain words? is there space, digit or other?, if there is the ascii bit has to be the same?
+
+Answers:
+1. magic is the password we are going to encrypt our text with. It has nothing to do with challange related stuff
+2. with or withouth magic the first bit will be the first bit changed
+3. messages can contain words digits spaces everything... there is ascii for digits and spaces too
