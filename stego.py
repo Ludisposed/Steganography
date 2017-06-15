@@ -35,10 +35,10 @@ def decrypt(filename, magic):
         print str(e)
 
 def text_ascii(text):
-    return map(lambda x:int(bin(ord(x))[2:]),text)
+    return map(lambda x: '{:07b}'.format(ord(x)),text)
 
 def change_lsb(text,data):
-    text = ''.join(map(str,text))
+    text = ''.join(text)
     t = 0
     for i in range(len(data)):
         for j in range(len(data[0])):
