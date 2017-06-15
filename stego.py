@@ -62,21 +62,6 @@ def retrieve_lsb(d):
                     print l
                     return 'lol'
 
-    '''
-    for i in range(len(data)):
-        for j in range(len(data[0])):
-            for k in range(3):
-                print (data[i][j][k] & 1)
-                l += str(data[i][j][k] & 1)
-                if len(l)==7:
-                    print l
-                    out += ascii_text(l)
-                    l = ''
-                    # if end byte then quit
-                if len(out) and out[-1] == '$':
-                    return out
-    '''
-
 def change_lsb(t,d):
     t = [int(x) for x in ''.join(t)]
     b = 0
