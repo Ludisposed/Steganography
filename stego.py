@@ -1,4 +1,4 @@
-import Image
+from PIL import Image
 import numpy as np
 import sys
 import os
@@ -12,14 +12,13 @@ def encrypt(filename, text, magic):
     # Load image in rgb-array
     # Least Significant Bit
     # Encrypt with 'Password:magic', and 'text'
-    print 'I am here'
     try:
         d = load_image( filename )
         print d
     except Exception,e:
         print str(e)
     
-def decrypt(filename, text, magic):
+def decrypt(filename, magic):
     # Load image in rgb-array
     # Least Significant Bit
     # Decrypt with 'Password:magic', and 'text'
@@ -64,6 +63,7 @@ if __name__ == "__main__":
         print str(err)
         usage()
 
+    magic = None
     for o,a in opts:
         if o in ("-h","--help"):
             usage()
@@ -76,14 +76,11 @@ if __name__ == "__main__":
         else:
             assert False,"Unhandled Option"
 
-        # Faulty but busy now
-        text = ''
-        if not to_encrypt:
-            filename    = sys.argv[3]
-        else:
-            filename    = sys.argv[3]
-            text        = sys.argv[4]
-
-        print to_encrypt, filename, text
-
-    
+    text = ''
+    if not to_encrypt:
+        filename    = sys.argv[2]
+        decrypt(filename, magic)
+    else:
+        filename    = sys.argv[2]
+        text        = sys.argv[3]
+        encrypt(filename, text, magic)   
