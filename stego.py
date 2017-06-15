@@ -12,13 +12,15 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 def encrypt(filename, text, magic):
     if not magic is None:
         hash = pbkdf2_sha256.encrypt(magic, rounds=10000, salt_size=16)
-        print pbkdf2_sha256.verify(magic, hash)
+        if pbkdf2_sha256.verify(magic, hash):
+            print 'The hash is correctly set\n'
     
     # Load image in rgb-array
     # Least Significant Bit
     # Encrypt with 'Password:magic', and 'text'
     try:
         d = load_image( filename )
+        print d
     except Exception,e:
         print str(e)
     
@@ -80,7 +82,6 @@ if __name__ == "__main__":
         else:
             assert False,"Unhandled Option"
 
-    print magic
     if not to_encrypt:
         filename    = args[0]
         decrypt(filename, magic)
