@@ -34,7 +34,10 @@ def decrypt(filename, magic):
     # Least Significant Bit
     # Decrypt with 'Password:magic'
     try:
+        # Load image
         d = load_image( filename )
+
+        # Retrieve text
         text = retrieve_lsb(d)
         print text
     except Exception,e:
@@ -43,38 +46,49 @@ def decrypt(filename, magic):
 def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
 def ascii_text(ascii):
+    print ascii
     return chr(int(ascii, 2))
 
-def retrieve_lsb(data):
-    t = 0
-    l = ''
+def retrieve_lsb(d):    
+    l = []
     out = ''
+    for _ in d:
+        for i in _:                
+            for k in range(3):
+                # incorrect but why .. maybe save method?
+                print i[k] & 1
+                l += [i[k] & 1]
+                if len(l) == 20:
+                    print l
+                    return 'lol'
+
+    '''
     for i in range(len(data)):
         for j in range(len(data[0])):
             for k in range(3):
+                print (data[i][j][k] & 1)
                 l += str(data[i][j][k] & 1)
-                print l
                 if len(l)==7:
+                    print l
                     out += ascii_text(l)
                     l = ''
+                    # if end byte then quit
                 if len(out) and out[-1] == '$':
-                    return out                
+                    return out
+    '''
 
-def change_lsb(text,data):
-    text = ''.join(text)
-    t = 0
-    if len(data)*len(data[0])*3 < len(text):
-        print 'Image not big enough'
-        sys.exit(0)
-    for i in range(len(data)):
-        for j in range(len(data[0])):
+def change_lsb(t,d):
+    t = [int(x) for x in ''.join(t)]
+    b = 0
+    for _ in d:
+        for i in _:                
             for k in range(3):
-                if data[i][j][k] & 1 == 1:
-                    data[i][j][k] -= 1
-                data[i][j][k] += int(text[t])
-                t += 1
-                if t >= len(text):
-                    return data
+                i[k] = (i[k] & ~1) | t[b]
+                b += 1
+                # Correct as proven below
+                # print i[k] & 1 == t[b-1], i[k] & 1
+                if b == len(t):
+                    return d
 
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
