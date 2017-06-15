@@ -1,4 +1,5 @@
 from PIL import Image
+from passlib.hash import pbkdf2_sha256
 import numpy as np
 import sys
 import os
@@ -9,19 +10,22 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 
 def encrypt(filename, text, magic):
+    if not magic is None:
+        hash = pbkdf2_sha256.encrypt(magic, rounds=10000, salt_size=16)
+        print pbkdf2_sha256.verify(magic, hash)
+    
     # Load image in rgb-array
     # Least Significant Bit
     # Encrypt with 'Password:magic', and 'text'
     try:
         d = load_image( filename )
-        print d
     except Exception,e:
         print str(e)
     
 def decrypt(filename, magic):
     # Load image in rgb-array
     # Least Significant Bit
-    # Decrypt with 'Password:magic', and 'text'
+    # Decrypt with 'Password:magic'
     try:
         d = load_image( filename )
         print d
@@ -49,16 +53,16 @@ def usage():
     print ""
     print "Examples: "
     print "stego.py -e test.jpeg howareyou"
-    print "stego.py -e test.jpeg howareyou --magic password"
+    print "stego.py -e --magic password test.jpeg howareyou "
     print "stego.py -d test.jpeg"
-    print "stego.py -d test.jpeg -m password"
+    print "stego.py -d -m password test.jpeg"
     sys.exit(0)
 
 if __name__ == "__main__":
     if not len(sys.argv[1:]):
         usage()
     try:
-        opts,args = getopt.getopt(sys.argv[1:],"hed:m",["help", "encrypt", "decrypt", "magic"])
+        opts,args = getopt.getopt(sys.argv[1:],"hedm:",["help", "encrypt", "decrypt", "magic="])
     except getopt.GetoptError as err:
         print str(err)
         usage()
@@ -76,11 +80,11 @@ if __name__ == "__main__":
         else:
             assert False,"Unhandled Option"
 
-    text = ''
+    print magic
     if not to_encrypt:
-        filename    = sys.argv[2]
+        filename    = args[0]
         decrypt(filename, magic)
     else:
-        filename    = sys.argv[2]
-        text        = sys.argv[3]
+        filename    = args[0]
+        text        = args[1]
         encrypt(filename, text, magic)   
