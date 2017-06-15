@@ -5,7 +5,7 @@ import sys
 import os
 import getopt
 
-# Set location of directory we are working in to load files
+# Set location of directory we are working in to load/save files
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -35,24 +35,30 @@ def decrypt(filename, magic):
     # Decrypt with 'Password:magic'
     try:
         d = load_image( filename )
+        text = retrieve_lsb(d)
+        print text
     except Exception,e:
         print str(e)
 
 def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
-def ascii_text(byte):
+def ascii_text(ascii):
     return chr(int(ascii, 2))
 
 def retrieve_lsb(data):
     t = 0
     l = ''
+    out = ''
     for i in range(len(data)):
         for j in range(len(data[0])):
             for k in range(3):
-                # Retrieve untill end is found
-                # return text
-                print 'THIS IS NOT FINISHED YET'
-                
+                l += str(data[i][j][k] & 1)
+                print l
+                if len(l)==7:
+                    out += ascii_text(l)
+                    l = ''
+                if len(out) and out[-1] == '$':
+                    return out                
 
 def change_lsb(text,data):
     text = ''.join(text)
@@ -65,7 +71,7 @@ def change_lsb(text,data):
             for k in range(3):
                 if data[i][j][k] & 1 == 1:
                     data[i][j][k] -= 1
-                data[i][j][k] = data[i][j][k] + int(text[t])
+                data[i][j][k] += int(text[t])
                 t += 1
                 if t >= len(text):
                     return data
