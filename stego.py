@@ -45,9 +45,8 @@ def decrypt(filename, magic):
 
 def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
-def ascii_text(ascii):
-    print ascii
-    return chr(int(ascii, 2))
+def ascii_text(a):
+    return chr(int(a, 2))
 
 def retrieve_lsb(d):    
     l = []
