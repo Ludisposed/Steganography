@@ -37,6 +37,21 @@ def decrypt(filename, magic):
 def text_ascii(text):
     return map(lambda x:int(bin(ord(x))[2:]),text)
 
+def change_lsb(text,data):
+    text = ''.join(map(str,text))
+    t = 0
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            for k in range(3):
+                if data[i][j][k] & 1 == 1:
+                    data[i][j][k] -= 1
+                data[i][j][k] = data[i][j][k] + int(text[t])
+                t += 1
+                if t >= len(text):
+                    # put end bit
+                    return data
+    # if t < len(text), image is not big enough for text
+
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
     img.load()
