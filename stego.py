@@ -38,6 +38,11 @@ def encrypt(filename, text, magic):
         # Load Image
         d_old = load_image( filename )
 
+        # Check if image can contain the data
+        if len(d_old)*len(d_old[0])*3 < len(text):
+            print 'image not big enough'
+            sys.exit(0)
+        
         # get new data and save to image
         d_new = change_lsb(text_ascii(text), d_old)
         save_image(d_new, 'new_'+filename)
@@ -56,8 +61,7 @@ def decrypt(filename, magic):
         # Added magic
         if not magic is None:
             text = decrypt_text(magic, text)
-            
-         print text
+        print text
     except Exception,e:
         print str(e)
 
