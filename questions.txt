@@ -13,3 +13,7 @@ Answers:
 [Ludis]
 Questions:
 1. Why does it not retrieve the correct bit at decode?
+
+[Qin]
+Answers:
+1.seems something weird happend in 'img.save( outfilename )' the RGB value changed
