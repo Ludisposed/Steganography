@@ -16,7 +16,9 @@ def encrypt(filename, text, magic):
         if pbkdf2_sha256.verify(magic, hash):
             print 'The hash is correctly set\n'
     try:
+        # Change format to png
         filename = change_image_form(filename)
+        
         # Load Image
         d_old = load_image( filename )
 
@@ -28,9 +30,6 @@ def encrypt(filename, text, magic):
         print str(e)
     
 def decrypt(filename, magic):
-    # Load image in rgb-array
-    # Least Significant Bit
-    # Decrypt with 'Password:magic'
     try:
         # Load image
         d = load_image( filename )
@@ -114,8 +113,6 @@ if __name__ == "__main__":
         usage()
     try:
         opts,args = getopt.getopt(sys.argv[1:],"hedm:",["help", "encrypt", "decrypt", "magic="])
-        #can't handle sapce, check the output
-        print opts,args
     except getopt.GetoptError as err:
         print str(err)
         usage()
