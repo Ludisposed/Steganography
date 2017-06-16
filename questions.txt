@@ -16,4 +16,5 @@ Questions:
 
 [Qin]
 Answers:
-1.seems something weird happend in 'img.save( outfilename )' the RGB value changed
+1.seems something weird happend in 'img.save( outfilename )' the RGB value changed.
+ps:I test 10,000 times save, only the first time 'save' image will be compressed 
