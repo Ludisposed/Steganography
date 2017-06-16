@@ -26,3 +26,7 @@ psps: works good on bmp and png image, still haven't find better solution. anoth
 [Qin]
 Questions:
 1. Can't handle space here
+
+[Ludisposed]
+Answers:
+stego.py -e filename.png "This is inside woutes with spaces"
