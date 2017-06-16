@@ -16,6 +16,7 @@ def encrypt(filename, text, magic):
         if pbkdf2_sha256.verify(magic, hash):
             print 'The hash is correctly set\n'
     try:
+        filename = change_image_form(filename)
         # Load Image
         d_old = load_image( filename )
 
@@ -25,7 +26,6 @@ def encrypt(filename, text, magic):
 
         # get new data and save to image
         d_new = change_lsb(text_ascii(text), d_old)
-        filename = ''.join(filename.split('.')[:-1]) + '.png'
         save_image(d_new, 'new_'+filename)
         
     except Exception,e:
@@ -85,24 +85,26 @@ def change_lsb(t,d):
                         return d
     return d
 
+
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
     img.load()
-
-    f = filename.split('.')
-    
-    if not (f[-1] == 'bmp' or f[-1] == 'BMP' or f[-1] == 'PNG' or f[-1] == 'png'):
-        filename = ''.join(f[:-1]) + '.png'
-        img.save(os.path.join(__location__, filename))
-        img = Image.open( os.path.join(__location__, filename) )
-        img.load()
     data = np.asarray( img, dtype="int32" )
     return data
 
 def save_image( npdata, outfilename ) :
     img = Image.fromarray( np.asarray( np.clip(npdata,0,255), dtype="uint8"), "RGB" )
     img.save(os.path.join(__location__, outfilename))
-    
+
+def change_image_form(filename):
+    f = filename.split('.')
+    if not (f[-1] == 'bmp' or f[-1] == 'BMP' or f[-1] == 'PNG' or f[-1] == 'png'):
+        img = Image.open( os.path.join(__location__, filename) )
+        img.load()
+        filename = ''.join(f[:-1]) + '.png'
+        img.save(os.path.join(__location__, filename))
+    return filename
+
 def usage():
     print "Steganography Tool @Ludisposed & @Qin"
     print ""
@@ -124,7 +126,8 @@ if __name__ == "__main__":
         usage()
     try:
         opts,args = getopt.getopt(sys.argv[1:],"hedm:",["help", "encrypt", "decrypt", "magic="])
-
+        #can't handle sapce, check the output
+        print opts,args
     except getopt.GetoptError as err:
         print str(err)
         usage()

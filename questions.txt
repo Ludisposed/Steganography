@@ -25,4 +25,4 @@ psps: works good on bmp and png image, still haven't find better solution. anoth
 
 [Qin]
 Questions:
-1. Why retrieve bit at decode end with '$'?
+1. Can't handle space here
