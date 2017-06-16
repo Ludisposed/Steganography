@@ -54,7 +54,7 @@ def decrypt(filename, magic):
         text = retrieve_lsb(d)
 
         # Added magic
-        if magic not is None:
+        if not magic is None:
             text = decrypt_text(magic, text)
             
          print text
