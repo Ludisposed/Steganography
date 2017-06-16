@@ -8,7 +8,7 @@ A python steganography tool
 4. #DONE# A Decoder function
 
 *Also TODO*
-1. Salt the text
+1. Encrypt the text
 2. Add Code to randomize
      + Example -rgb rb # Changes only Red and Blue
      + Example -s 10   # Steps over 10 rbg arr and then changes
