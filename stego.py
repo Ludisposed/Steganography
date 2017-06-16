@@ -20,10 +20,6 @@ def encrypt(filename, text, magic):
         # Load Image
         d_old = load_image( filename )
 
-        # Define end_bit and add to text
-        end = '$'
-        text += end
-
         # get new data and save to image
         d_new = change_lsb(text_ascii(text), d_old)
         save_image(d_new, 'new_'+filename)
@@ -66,23 +62,15 @@ def retrieve_lsb(d):
     return out
 
 def change_lsb(t,d):
-    t = [int(x) for x in ''.join(t)]
+    t = [int(x) for x in ''.join(t)] + [0]*7 # endbit
     b = 0
-    end = False
-    e = 0
     for _ in d:
         for i in _:                
             for k in range(3):
-                if not end:
-                    i[k] = (i[k] & ~1) | t[b]
-                    b += 1
-                    if b == len(t):
-                        end = True
-                else:
-                    i[k] = i[k] & ~1
-                    e += 1
-                    if e == 7:
-                        return d
+                i[k] = (i[k] & ~1) | t[b]
+                b += 1
+                if b == len(t):
+                    return d
     return d
 
 
