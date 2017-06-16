@@ -1,20 +1,36 @@
 from PIL import Image
-from passlib.hash import pbkdf2_sha256
 import numpy as np
 import sys
 import os
 import getopt
+import base64
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
 
 # Set location of directory we are working in to load/save files
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+def get_key(password):
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(password)
+    return base64.urlsafe_b64encode(digest.finalize())
+
+def encrypt_text(password, token):
+    f = Fernet(get_key(password))
+    return f.encrypt(bytes(token))
+
+def decrypt_text(password, token):
+    f = Fernet(get_key(password))
+    return f.decrypt(bytes(token))
 
 def encrypt(filename, text, magic):
+    
+    #The magic
     if not magic is None:
+        key = Fernet.generate_key()
+        text = encrypt_text(magic, text)
         
-        hash = pbkdf2_sha256.encrypt(magic, rounds=10000, salt_size=16)
-        if pbkdf2_sha256.verify(magic, hash):
-            print 'The hash is correctly set\n'
     try:
         # Change format to png
         filename = change_image_form(filename)
@@ -36,7 +52,12 @@ def decrypt(filename, magic):
 
         # Retrieve text
         text = retrieve_lsb(d)
-        print text
+
+        # Added magic
+        if magic not is None:
+            text = decrypt_text(magic, text)
+            
+         print text
     except Exception,e:
         print str(e)
 
@@ -112,6 +133,7 @@ if __name__ == "__main__":
     if not len(sys.argv[1:]):
         usage()
     try:
+        # Adding optional -s [steps] -rgb [r or g or b]
         opts,args = getopt.getopt(sys.argv[1:],"hedm:",["help", "encrypt", "decrypt", "magic="])
     except getopt.GetoptError as err:
         print str(err)
