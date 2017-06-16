@@ -17,4 +17,4 @@ Questions:
 [Qin]
 Answers:
 1.seems something weird happend in 'img.save( outfilename )' the RGB value changed.
-ps:I test 10,000 times save, only the first time 'save' image will be compressed 
+ps:when 'save' image will be compressed, and even change lsb on compressed image's RGB, 'save' still change something, back to the rgb value before change. that is, even can't retrieve correct bit at decode, but the error bit received each time are the same
