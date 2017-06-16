@@ -50,31 +50,39 @@ def ascii_text(a):
     return chr(int(a, 2))
 
 def retrieve_lsb(d):    
-    l = 0
+    l = ''
     out = ''
     for _ in d:
         for i in _:                
             for k in range(3):
-                # incorrect but why .. maybe save method?
-                print i[k] & 1
-                l = l * 10 + (i[k] & 1)
-                print l, len(str(l))
-                if l > 1 and len(str(l)) % 7 == 0:
-                    print l
-                    return ascii_text(str(l))
+                l += str(i[k] & 1)
+                if len(l) == 7:
+                    if int(l) > 0:
+                        out += ascii_text(l)
+                        l = ''
+                    else:
+                        return out
+    return out
 
 def change_lsb(t,d):
     t = [int(x) for x in ''.join(t)]
     b = 0
+    end = False
+    e = 0
     for _ in d:
         for i in _:                
             for k in range(3):
-                i[k] = (i[k] & ~1) | t[b]
-                b += 1
-                # Correct as proven below
-                # print i[k] & 1 == t[b-1], i[k] & 1
-                if b == len(t):
-                    return d
+                if not end:
+                    i[k] = (i[k] & ~1) | t[b]
+                    b += 1
+                    if b == len(t):
+                        end = True
+                else:
+                    i[k] = i[k] & ~1
+                    e += 1
+                    if e == 7:
+                        return d
+    return d
 
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
