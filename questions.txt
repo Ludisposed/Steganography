@@ -30,3 +30,7 @@ Questions:
 [Ludisposed]
 Answers:
 stego.py -e filename.png "This is inside woutes with spaces"
+
+[Qin]
+Questions:
+1.about rsa, when two people communicate with each other, they need cexchange their public key, right?
