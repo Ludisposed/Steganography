@@ -40,9 +40,12 @@ def encrypt(filename, text, magic, step):
         d_old = load_image( filename )
 
         # Check if image can contain the data
-        if len(d_old)*len(d_old[0])*3 < len(text):
+        if ('0' <= step[0] <= '9' and len(d_old)*len(d_old[0])*3 < len(text) * int(step))\
+        or ('a' <= step[0] <= 'z' and len(d_old)*len(d_old[0])*len(step) < len(text)): 
             print 'image not big enough'
             sys.exit(0)
+
+
         
         # get new data and save to image
         d_new = change_lsb(text_ascii(text), d_old, step)
@@ -130,7 +133,7 @@ def change_image_form(filename):
         filename = ''.join(f[:-1]) + '.png'
         img.save(os.path.join(__location__, filename))
     return filename
-# bad function name
+# TODO: bad function name
 # return a list: 0 is the range of 'k', 1 is step in int
 def step_info(step):
     if len(step) == 0:
