@@ -33,4 +33,8 @@ stego.py -e filename.png "This is inside woutes with spaces"
 
 [Qin]
 Questions:
-1.about rsa, when two people communicate with each other, they need cexchange their public key, right?
+1.about rsa, when two people communicate with each other, they need exchange their public key, right?
+2.about step and magic in decrypt, does customer needs to input step in decrypt?(just need magic), if only need magic to decrypt, I guess, in encrypt:
+   a.first encrypt magic and step return a token, then use this token to encrypt text(will it be too long?)
+   b.step message in the first several pixes(seems not safe)
+  
