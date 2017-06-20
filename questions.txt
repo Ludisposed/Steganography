@@ -37,4 +37,10 @@ Questions:
 2.about step and magic in decrypt, does customer needs to input step in decrypt?(just need magic), if only need magic to decrypt, I guess, in encrypt:
    a.first encrypt magic and step return a token, then use this token to encrypt text(will it be too long?)
    b.step message in the first several pixes(seems not safe)
-  
+
+[Ludisposed]
+Answers
+1. Yes you encrypt with private key, and give public key to anyone who can then decrypt our message
+2. A. Yes step is a bit difficult we could indeed step with the token or magic...
+   B. At decrypt this becomes an issue because the decrypter needs to know --magic --step --rgb maybe to much information... Shorter is better
+   C. Don't see what you mean with step in first few pixels  
