@@ -28,10 +28,8 @@ def decrypt_text(password, token):
 
 def encrypt(filename, text, magic):
     
-    #The magic
-    if not magic is None:
-        key = Fernet.generate_key()
-        text = encrypt_text(magic, text)
+    key = Fernet.generate_key()
+    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7
         
     try:
         # Change format to png
@@ -39,8 +37,7 @@ def encrypt(filename, text, magic):
         
         # Load Image
         d_old = load_image( filename )        
-        encrypt_lsb(d_old, magic, text)
-        
+        d_old = encrypt_lsb(d_old, magic, t)      
         save_image(d_old, 'new_'+filename)
         
     except Exception,e:
@@ -52,6 +49,7 @@ def decrypt(filename, magic):
         d = load_image( filename )
         
         text = decrypt_lsb(d, magic)
+        print magic, text
         print decrypt_text(magic, text)
 
     except Exception,e:
@@ -63,8 +61,8 @@ def ascii_text(a):
     return chr(int(a, 2))
 
 def encrypt_lsb(d, m, t):
-    t = [int(x) for x in ''.join(text_ascii(t))] + [0]*7 # endbit
-    
+    print '[*] Starting Encryption'
+    print t
     # We must alter the seed but for now lets make it simple
     # this requeris the use of paswords though
     
@@ -72,35 +70,73 @@ def encrypt_lsb(d, m, t):
     for i in m:
         seed *= ord(i)
     random.seed(seed)
+    print seed
     
     r = random.sample(range(1, d.size), len(t))
-    d_lin = d.view()  # construct a view
-    d_lin.shape = -1  # turn the view into a 1d array
     for i in range(len(r)):
-        d_lin[r[i]-1] = (d_lin[r[i]-1] & ~1) | t[i]
+        
+        d.flat[r[i]-1] = (d.flat[r[i]-1] & ~1) | t[i]
+        
+        if d.flat[r[i]-1] & 1 != t[i]:
+            print 'at %d lsb = %d' % (r[i]-1, d.flat[r[i]-1] & 1)
+            print 'bit from text = %d' % t[i]
 
-def decrypt_lsb(d, m):
-    
+
+    # Proof the old array is altered with correct value
     seed = 1
     for i in m:
         seed *= ord(i)
     random.seed(seed)
+    print seed
+
+    # Works for:
+    r = random.sample(range(1, d.size), len(t))
+
+    # Does not work for
+    r2 = random.sample(range(1, d.size), d.size-1)
+    
+    out2 = v = ''
+    for i in range(len(r)):
+        if r[i]-1 != r2[i]-1:
+            print 'at %d: r=%d and r2=%d' % (i, r[i]-1, r2[i]-1)
+        
+        if d.flat[r[i]-1] & 1 != t[i]:
+            print 'at %d lsb = %d' % (r[i]-1, d.flat[r[i]-1] & 1)
+            print 'bit from text = %d' % t[i]
+        v += str(d.flat[r[i]-1] & 1)        
+        if len(v) == 7:
+            if int(v) > 0:
+                 out2 += ascii_text(v)
+                 v = ''
+            else:
+                 print decrypt_text(m, out2)
+
+
+    print '[*] Finished Encryption'
+    return d
+    
+def decrypt_lsb(d, m):
+    print '[*] Starting Decryption'
+    seed = 1
+    for i in m:
+        seed *= ord(i)
+    random.seed(seed)
+    print seed
     
     r = random.sample(range(1, d.size), d.size-1)
-    d_lin = d.view()  # construct a view
-    d_lin.shape = -1  # turn the view into a 1d array
-
-    l = ''
-    out = ''
-    
+    out2 = v = ''
     for i in range(len(r)):
-        l += str(d_lin[r[i]-1] & 1)
-        if len(l) == 7:
-             if int(l) > 0:
-                 out += ascii_text(l)
-                 l = ''
-             else:
-                 return out
+
+        v += str(d.flat[r[i]-1] & 1)
+        # print d_lin[r[i]-1] & 1
+        
+        if len(v) == 7:
+            if int(v) > 0:
+                 out2 += ascii_text(v)
+                 v = ''
+            else:
+                 print '[*] Finished Decryption'
+                 return out2
 
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
@@ -121,6 +157,22 @@ def change_image_form(filename):
         img.save(os.path.join(__location__, filename))
     return filename
 
+def usage():
+    print "Steganography prng-Tool @Ludisposed & @Qin"
+    print ""
+    print "Usage: stego.py -e -m magic filename text "
+    print "-e --encrypt              - encrypt filename with text"
+    print "-d --decrypt              - decrypt filename"
+    print "-m --magic                - encrypt/decrypt with password"
+    print ""
+    print ""
+    print "Examples: "
+    print "stego.py -e -m pass test.png howareyou"
+    print 'stego.py --encrypt --magic password test.png "howareyou  some other text"'
+    print "stego.py -d -m password test.png"
+    print "stego.py --decrypt --magic password test.png"
+    sys.exit(0)
+
 if __name__ == "__main__":
     if not len(sys.argv[1:]):
         usage()
@@ -130,8 +182,7 @@ if __name__ == "__main__":
         print str(err)
         usage()
 
-    magic = None
-    step = ""
+    magic = to_encrypt = None
     for o,a in opts:
         if o in ("-h","--help"):
             usage()
@@ -144,9 +195,8 @@ if __name__ == "__main__":
         else:
             assert False,"Unhandled Option"
 
-    if magic is None:
-        print 'Only possible with password'
-        sys.exit(0)
+    if magic is None or to_encrypt is None:
+        usage()
     
     if not to_encrypt:
         filename    = args[0]
