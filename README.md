@@ -12,4 +12,11 @@ A python steganography tool
 2. Add Code to randomize
      + Example -rgb rb # Changes only Red and Blue
      + Example -s 10   # Steps over 10 rbg arr and then changes
-3. Add check if image has enough space for the string to hide
+
+*New TODO*
+1. Add check if image has enough space for the string to hide
+2. Make code more readable for toher programmers
+3. Make more prints for users
+4. improve seed method
+5. improve location of files, so we can work with files outside of the current directory
+6. **MAYBE** Add encryption from file... instead of text in command promt

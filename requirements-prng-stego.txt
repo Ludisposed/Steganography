@@ -1,0 +1,6 @@
+###### Requirements ######
+###### Usage: pip install -r requirements-prng-stego.txt
+Pillow
+cryptography
+numpy
+##### END #####
