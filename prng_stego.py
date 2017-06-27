@@ -5,6 +5,8 @@ import os
 import getopt
 import base64
 import random
+import progressbar
+import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -27,12 +29,20 @@ def decrypt_text(password, token):
 
 def encrypt(filename, text, magic):
     key = Fernet.generate_key()
-    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7
+    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7 # endbit
     try:
         # Change format to png
         filename = change_image_form(filename)
+
         # Load Image
-        d_old = load_image( filename )        
+        d_old = load_image( filename ) 
+
+        # Check if image can contain the data
+        if len(d_old)*len(d_old[0])*3 < len(t): 
+            print 'image not big enough'
+            sys.exit(0)
+
+        # get new data and save to image
         d_new = encrypt_lsb(d_old, magic, t)      
         save_image(d_new, 'new_'+filename)
     except Exception,e:
@@ -42,6 +52,8 @@ def decrypt(filename, magic):
     try:
         # Load image
         d = load_image( filename )
+
+        # Retrieve text
         text = decrypt_lsb(d, magic)
         print '[*] Retrieved text: %s' % decrypt_text(magic, text)
     except Exception,e:
@@ -51,11 +63,14 @@ def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
 def ascii_text(a):
     return chr(int(a, 2))
+
+# TODO: should say something here?
 def next_random(r, d):
     r2 = random.randint(0, d.size-1)
     while r2 in r:
         r2 = random.randint(0, d.size-1)
     return r2
+
 def generate_seed(m):
     seed = 1
     for i in m:
@@ -70,37 +85,56 @@ def encrypt_lsb(d, m, t):
     random.seed(generate_seed(m))
     
     r = []
-    for i in range(len(t)):
+    n = len(t)
+
+    #process bar
+    bar = progressbar.ProgressBar(maxval=n, \
+    widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
+
+    for i in range(n):
+
+        #process bar update
+        time.sleep(0.001)
+        bar.update(i+1) 
+
         r2 = next_random(r, d)
         r.append(r2)
-        d.flat[r2] = (d.flat[r2] & ~1) | t[i]  
+        d.flat[r2] = (d.flat[r2] & ~1) | t[i]
+
+    bar.finish()     
 
     print '[*] Finished Encryption'
     return d
-    
+
+# process bar is not suitable for decrypt, 
+# as the text length much smaller than data size, 
+# alway stop like suddenly
 def decrypt_lsb(d, m):
     print '[*] Starting Decryption'
     random.seed(generate_seed(m))
     
     r = []
     out2 = v = ''
+
     for i in range(d.size):
         r2 = next_random(r, d)
         r.append(r2)
         v += str(d.flat[r2] & 1)        
         if len(v) == 7:
-            if int(v) > 0:
-                 out2 += ascii_text(v)
-                 v = ''
+            if int(v) > 0:                
+                out2 += ascii_text(v)
+                v = ''
             else:
-                 print '[*] Finished Decryption'
-                 return out2
+                print '[*] Finished Decryption'
+                return out2
 
 def load_image( filename ) :
     img = Image.open( os.path.join(__location__, filename) )
     img.load()
     data = np.asarray( img, dtype="int32" )
     return data
+    
 
 def save_image( npdata, outfilename ) :
     img = Image.fromarray( np.asarray( np.clip(npdata,0,255), dtype="uint8"), "RGB" )
@@ -114,6 +148,7 @@ def change_image_form(filename):
         filename = ''.join(f[:-1]) + '.png'
         img.save(os.path.join(__location__, filename))
     return filename
+    
 
 def usage():
     print "Steganography prng-Tool @Ludisposed & @Qin"
