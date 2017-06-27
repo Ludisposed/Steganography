@@ -5,7 +5,7 @@ import os
 import getopt
 import base64
 import random
-import progressbar
+#import progressbar
 import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -38,7 +38,7 @@ def encrypt(filename, text, magic):
         d_old = load_image( filename ) 
 
         # Check if image can contain the data
-        if d.size < len(t): 
+        if d_old.size < len(t): 
             print 'image not big enough'
             sys.exit(0)
 
@@ -69,12 +69,14 @@ def next_random(r, d):
     r2 = random.randint(0, d.size-1)
     while r2 in r:
         r2 = random.randint(0, d.size-1)
+    # Would be fun if we say pixel at point[a,b] with colour = Green was altered
     return r2
 
 def generate_seed(m):
     seed = 1
     for i in m:
         seed *= ord(i)
+    print '[*] Your magic number is %d' % seed
     return seed
 
 
@@ -85,24 +87,24 @@ def encrypt_lsb(d, m, t):
     random.seed(generate_seed(m))
     
     r = []
-    n = len(t)
+    #n = len(t)
 
     #process bar
-    bar = progressbar.ProgressBar(maxval=n, \
-    widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
-    bar.start()
+    #bar = progressbar.ProgressBar(maxval=n, \
+    #widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
+    #bar.start()
 
-    for i in range(n):
+    for i in range(len(t)):
 
         #process bar update
-        time.sleep(0.001)
-        bar.update(i+1) 
+        #time.sleep(0.001)
+        #bar.update(i+1) 
 
         r2 = next_random(r, d)
         r.append(r2)
         d.flat[r2] = (d.flat[r2] & ~1) | t[i]
 
-    bar.finish()     
+    #bar.finish()     
 
     print '[*] Finished Encryption'
     return d
