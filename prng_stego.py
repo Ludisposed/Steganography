@@ -4,7 +4,6 @@ import sys
 import os
 import getopt
 import base64
-import re
 import random
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -27,19 +26,15 @@ def decrypt_text(password, token):
     return f.decrypt(bytes(token))
 
 def encrypt(filename, text, magic):
-    
     key = Fernet.generate_key()
     t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7
-        
     try:
         # Change format to png
         filename = change_image_form(filename)
-        
         # Load Image
         d_old = load_image( filename )        
         d_new = encrypt_lsb(d_old, magic, t)      
         save_image(d_new, 'new_'+filename)
-        
     except Exception,e:
         print str(e)
     
@@ -47,10 +42,8 @@ def decrypt(filename, magic):
     try:
         # Load image
         d = load_image( filename )
-        
         text = decrypt_lsb(d, magic)
-        print decrypt_text(magic, text)
-
+        print '[*] Retrieved text: %s' % decrypt_text(magic, text)
     except Exception,e:
         print str(e)
 
@@ -63,44 +56,37 @@ def next_random(r, d):
     while r2 in r:
         r2 = random.randint(0, d.size-1)
     return r2
+def generate_seed(m):
+    seed = 1
+    for i in m:
+        seed *= ord(i)
+    return seed
 
 
 def encrypt_lsb(d, m, t):
     print '[*] Starting Encryption'
-    # We must alter the seed but for now lets make it simple
-    # this requeris the use of paswords though
     
-    seed = 1
-    for i in m:
-        seed *= ord(i)
-    random.seed(seed)
+    # We must alter the seed but for now lets make it simple
+    random.seed(generate_seed(m))
     
     r = []
     for i in range(len(t)):
         r2 = next_random(r, d)
         r.append(r2)
-            
         d.flat[r2] = (d.flat[r2] & ~1) | t[i]  
-        if d.flat[r2] & 1 != t[i]:
-            print 'at %d lsb = %d' % (r2, d.flat[r[i]] & 1)
-            print 'bit from text = %d' % t[i]
 
     print '[*] Finished Encryption'
     return d
     
 def decrypt_lsb(d, m):
     print '[*] Starting Decryption'
-    seed = 1
-    for i in m:
-        seed *= ord(i)
-    random.seed(seed)
+    random.seed(generate_seed(m))
     
     r = []
     out2 = v = ''
     for i in range(d.size):
         r2 = next_random(r, d)
         r.append(r2)
-        
         v += str(d.flat[r2] & 1)        
         if len(v) == 7:
             if int(v) > 0:
