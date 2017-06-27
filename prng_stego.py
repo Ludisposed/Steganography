@@ -118,17 +118,17 @@ def change_image_form(filename):
 def usage():
     print "Steganography prng-Tool @Ludisposed & @Qin"
     print ""
-    print "Usage: stego.py -e -m magic filename text "
+    print "Usage: prng_stego.py -e -m magic filename text "
     print "-e --encrypt              - encrypt filename with text"
     print "-d --decrypt              - decrypt filename"
     print "-m --magic                - encrypt/decrypt with password"
     print ""
     print ""
     print "Examples: "
-    print "stego.py -e -m pass test.png howareyou"
-    print 'stego.py --encrypt --magic password test.png "howareyou  some other text"'
-    print "stego.py -d -m password test.png"
-    print "stego.py --decrypt --magic password test.png"
+    print "prng_stego.py -e -m pass test.png howareyou"
+    print 'prng_stego.py --encrypt --magic password test.png "howareyou  some other text"'
+    print "prng_stego.py -d -m password test.png"
+    print "prng_stego.py --decrypt --magic password test.png"
     sys.exit(0)
 
 if __name__ == "__main__":
