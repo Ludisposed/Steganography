@@ -89,17 +89,13 @@ def encrypt_lsb(d, m, t):
     random.seed(seed)
     print seed
 
-    # Works for:
-    r = random.sample(range(1, d.size), len(t))
-
-    # Does not work for
-    r2 = random.sample(range(1, d.size), d.size-1)
-    
     out2 = v = ''
     for i in range(len(r)):
-        if r[i]-1 != r2[i]-1:
-            print 'at %d: r=%d and r2=%d' % (i, r[i]-1, r2[i]-1)
-        
+        r2 = random.randint(1, d.size)
+        if r[i]-1 == r2-2:
+            print 'at %d: r=%d and r2-2=%d,' % (i, r[i]-1, r2-2)
+        if r[i]-1 == r2-1:
+            print 'at %d: r=%d and r2-1=%d,' % (i, r[i]-1, r2-1)
         if d.flat[r[i]-1] & 1 != t[i]:
             print 'at %d lsb = %d' % (r[i]-1, d.flat[r[i]-1] & 1)
             print 'bit from text = %d' % t[i]
