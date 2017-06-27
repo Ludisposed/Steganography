@@ -1,0 +1,7 @@
+###### Requirements ######
+###### Usage: pip install -r requirements-prng-stego.txt
+PIL
+getopt
+cryptography
+numpy
+##### END #####
