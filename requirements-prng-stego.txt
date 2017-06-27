@@ -3,4 +3,5 @@
 Pillow
 cryptography
 numpy
+progressbar
 ##### END #####
