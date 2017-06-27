@@ -37,8 +37,8 @@ def encrypt(filename, text, magic):
         
         # Load Image
         d_old = load_image( filename )        
-        d_old = encrypt_lsb(d_old, magic, t)      
-        save_image(d_old, 'new_'+filename)
+        d_new = encrypt_lsb(d_old, magic, t)      
+        save_image(d_new, 'new_'+filename)
         
     except Exception,e:
         print str(e)
@@ -49,7 +49,6 @@ def decrypt(filename, magic):
         d = load_image( filename )
         
         text = decrypt_lsb(d, magic)
-        print magic, text
         print decrypt_text(magic, text)
 
     except Exception,e:
@@ -59,10 +58,15 @@ def text_ascii(text):
     return map(lambda x: '{:07b}'.format(ord(x)),text)
 def ascii_text(a):
     return chr(int(a, 2))
+def next_random(r, d):
+    r2 = random.randint(0, d.size-1)
+    while r2 in r:
+        r2 = random.randint(0, d.size-1)
+    return r2
+
 
 def encrypt_lsb(d, m, t):
     print '[*] Starting Encryption'
-    print t
     # We must alter the seed but for now lets make it simple
     # this requeris the use of paswords though
     
@@ -70,43 +74,16 @@ def encrypt_lsb(d, m, t):
     for i in m:
         seed *= ord(i)
     random.seed(seed)
-    print seed
     
-    r = random.sample(range(1, d.size), len(t))
-    for i in range(len(r)):
-        
-        d.flat[r[i]-1] = (d.flat[r[i]-1] & ~1) | t[i]
-        
-        if d.flat[r[i]-1] & 1 != t[i]:
-            print 'at %d lsb = %d' % (r[i]-1, d.flat[r[i]-1] & 1)
+    r = []
+    for i in range(len(t)):
+        r2 = next_random(r, d)
+        r.append(r2)
+            
+        d.flat[r2] = (d.flat[r2] & ~1) | t[i]  
+        if d.flat[r2] & 1 != t[i]:
+            print 'at %d lsb = %d' % (r2, d.flat[r[i]] & 1)
             print 'bit from text = %d' % t[i]
-
-
-    # Proof the old array is altered with correct value
-    seed = 1
-    for i in m:
-        seed *= ord(i)
-    random.seed(seed)
-    print seed
-
-    out2 = v = ''
-    for i in range(len(r)):
-        r2 = random.randint(1, d.size)
-        if r[i]-1 == r2-2:
-            print 'at %d: r=%d and r2-2=%d,' % (i, r[i]-1, r2-2)
-        if r[i]-1 == r2-1:
-            print 'at %d: r=%d and r2-1=%d,' % (i, r[i]-1, r2-1)
-        if d.flat[r[i]-1] & 1 != t[i]:
-            print 'at %d lsb = %d' % (r[i]-1, d.flat[r[i]-1] & 1)
-            print 'bit from text = %d' % t[i]
-        v += str(d.flat[r[i]-1] & 1)        
-        if len(v) == 7:
-            if int(v) > 0:
-                 out2 += ascii_text(v)
-                 v = ''
-            else:
-                 print decrypt_text(m, out2)
-
 
     print '[*] Finished Encryption'
     return d
@@ -117,15 +94,14 @@ def decrypt_lsb(d, m):
     for i in m:
         seed *= ord(i)
     random.seed(seed)
-    print seed
     
-    r = random.sample(range(1, d.size), d.size-1)
+    r = []
     out2 = v = ''
-    for i in range(len(r)):
-
-        v += str(d.flat[r[i]-1] & 1)
-        # print d_lin[r[i]-1] & 1
+    for i in range(d.size):
+        r2 = next_random(r, d)
+        r.append(r2)
         
+        v += str(d.flat[r2] & 1)        
         if len(v) == 7:
             if int(v) > 0:
                  out2 += ascii_text(v)
