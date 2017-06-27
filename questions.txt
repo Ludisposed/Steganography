@@ -43,4 +43,8 @@ Answers
 1. Yes you encrypt with private key, and give public key to anyone who can then decrypt our message
 2. A. Yes step is a bit difficult we could indeed step with the token or magic...
    B. At decrypt this becomes an issue because the decrypter needs to know --magic --step --rgb maybe to much information... Shorter is better
-   C. Don't see what you mean with step in first few pixels  
+   C. Don't see what you mean with step in first few pixels 
+
+[Qin]
+Discussing
+try to use fuction 'encrypt_text' to encrypt magic before generate seed, and unfortunately to find that each time using same password and same text, the encrypt result are different. 

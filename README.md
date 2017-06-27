@@ -14,8 +14,8 @@ A python steganography tool
      + Example -s 10   # Steps over 10 rbg arr and then changes
 
 *New TODO*
-1. Add check if image has enough space for the string to hide
-2. Make code more readable for toher programmers
+1. #DONE#Add check if image has enough space for the string to hide
+2. Make code more readable for other programmers
 3. Make more prints for users
 4. improve seed method
 5. improve location of files, so we can work with files outside of the current directory
