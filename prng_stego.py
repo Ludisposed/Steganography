@@ -38,7 +38,7 @@ def encrypt(filename, text, magic):
         d_old = load_image( filename ) 
 
         # Check if image can contain the data
-        if len(d_old)*len(d_old[0])*3 < len(t): 
+        if d.size < len(t): 
             print 'image not big enough'
             sys.exit(0)
 
