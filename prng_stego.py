@@ -5,7 +5,7 @@ import os
 import getopt
 import base64
 import random
-#import progressbar
+import progressbar
 import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -28,7 +28,11 @@ def decrypt_text(password, token):
     return f.decrypt(bytes(token))
 
 def encrypt(filename, text, magic):
-    key = Fernet.generate_key()
+    # check whether the text is a file name
+    f = text.split('.')
+    if f[-1] == 'txt' or f[-1] == 'text':
+        text = read_files(os.path.join(__location__, text))
+    #key = Fernet.generate_key()
     t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7 # endbit
     try:
         # Change format to png
@@ -55,7 +59,7 @@ def decrypt(filename, magic):
 
         # Retrieve text
         text = decrypt_lsb(d, magic)
-        print '[*] Retrieved text: %s' % decrypt_text(magic, text)
+        print '[*] Retrieved text: \n%s' % decrypt_text(magic, text)
     except Exception,e:
         print str(e)
 
@@ -87,24 +91,24 @@ def encrypt_lsb(d, m, t):
     random.seed(generate_seed(m))
     
     r = []
-    #n = len(t)
+    n = len(t)
 
     #process bar
-    #bar = progressbar.ProgressBar(maxval=n, \
-    #widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
-    #bar.start()
+    bar = progressbar.ProgressBar(maxval=n, \
+    widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
 
     for i in range(len(t)):
 
         #process bar update
-        #time.sleep(0.001)
-        #bar.update(i+1) 
+        time.sleep(0.001)
+        bar.update(i+1) 
 
         r2 = next_random(r, d)
         r.append(r2)
         d.flat[r2] = (d.flat[r2] & ~1) | t[i]
 
-    #bar.finish()     
+    bar.finish()     
 
     print '[*] Finished Encryption'
     return d
@@ -150,7 +154,16 @@ def change_image_form(filename):
         filename = ''.join(f[:-1]) + '.png'
         img.save(os.path.join(__location__, filename))
     return filename
-    
+def read_files(filename):
+    text = ""
+    try:
+        with open(filename,'r') as f:
+            for line in f:
+                text += line#.replace('\n',' ')
+        return text
+    except Exception,e:
+        print str(e)
+
 
 def usage():
     print "Steganography prng-Tool @Ludisposed & @Qin"
