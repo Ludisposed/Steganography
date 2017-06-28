@@ -5,7 +5,7 @@ import os
 import getopt
 import base64
 import random
-from progressbar import *
+#from progressbar import *
 import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -73,6 +73,7 @@ def next_random(r, d):
     r2 = random.randint(0, d.size-1)
     while r2 in r:
         r2 = random.randint(0, d.size-1)
+    
     # Would be fun if we say pixel at point[a,b] with colour = Green was altered
     return r2
 
@@ -94,13 +95,13 @@ def encrypt_lsb(d, m, t):
     
 
     #process bar
-    bar = ProgressBar(widgets=['Encryption: ', AnimatedMarker()])
+    #bar = ProgressBar(widgets=['Encryption: ', AnimatedMarker()])
     
 
-    for i in bar(range(len(t))):
+    for i in range(len(t)):
 
         #process bar update
-        time.sleep(0.001)
+        #time.sleep(0.001)
         
 
         r2 = next_random(r, d)
@@ -157,9 +158,7 @@ def read_files(filename):
     text = ""
     try:
         with open(filename,'r') as f:
-            for line in f:
-                text += line#.replace('\n',' ')
-        return text
+           return ''.join([i for i in f])
     except Exception,e:
         print str(e)
 
