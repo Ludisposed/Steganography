@@ -154,7 +154,7 @@ def read_files(filename):
     if os.path.exists(filename):
         with open(filename,'r') as f:
            return ''.join([i for i in f])
-    return filename
+    return filename.split('/')[-1]
 
 
 def usage():
