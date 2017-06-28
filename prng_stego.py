@@ -5,7 +5,7 @@ import os
 import getopt
 import base64
 import random
-import progressbar
+from progressbar import *
 import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -91,24 +91,23 @@ def encrypt_lsb(d, m, t):
     random.seed(generate_seed(m))
     
     r = []
-    n = len(t)
+    
 
     #process bar
-    bar = progressbar.ProgressBar(maxval=n, \
-    widgets=[progressbar.Bar('*', '[', ']'), ' ', progressbar.Percentage()])
-    bar.start()
+    bar = ProgressBar(widgets=['Encryption: ', AnimatedMarker()])
+    
 
-    for i in range(len(t)):
+    for i in bar(range(len(t))):
 
         #process bar update
         time.sleep(0.001)
-        bar.update(i+1) 
+        
 
         r2 = next_random(r, d)
         r.append(r2)
         d.flat[r2] = (d.flat[r2] & ~1) | t[i]
 
-    bar.finish()     
+         
 
     print '[*] Finished Encryption'
     return d
