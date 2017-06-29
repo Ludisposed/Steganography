@@ -34,7 +34,7 @@ def encrypt(filename, text, magic):
     # check whether the text is a file name
     if len(text.split('.')[1:]):
         text = read_files(os.path.join(__location__, text))
-    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7 # endbit
+    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7  # endbit
     try:
         # Change format to png
         filename = change_image_form(filename)
@@ -132,7 +132,7 @@ def load_image(filename):
     return data
 
 
-def save_image(npdata, outfilename) :
+def save_image(npdata, outfilename):
     img = Image.fromarray(np.asarray(np.clip(npdata, 0, 255), dtype="uint8"), "RGB")
     img.save(os.path.join(__location__, outfilename))
 
