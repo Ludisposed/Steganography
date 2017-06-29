@@ -5,8 +5,6 @@ import os
 import getopt
 import base64
 import random
-from progressbar import *
-import time
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -29,10 +27,9 @@ def decrypt_text(password, token):
 
 def encrypt(filename, text, magic):
     # check whether the text is a file name
-    f = text.split('.')
-    if f[-1] == 'txt' or f[-1] == 'text':
+    if len(text.split('.')[1:]):
         text = read_files(os.path.join(__location__, text))
-    key = Fernet.generate_key()
+    #key = Fernet.generate_key()
     t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7 # endbit
     try:
         # Change format to png
@@ -68,19 +65,10 @@ def text_ascii(text):
 def ascii_text(a):
     return chr(int(a, 2))
 
-# TODO: should say something here?
 def next_random(r, d):
     r2 = random.randint(0, d.size-1)
     while r2 in r:
         r2 = random.randint(0, d.size-1)
-        
-    if r2 % 3 == 0: colour = 'Red'
-    elif r2 % 3 == 1: colour = 'Green'
-    else: colour = 'Blue'
-
-    # Almost there maybe np.unravel_index can help us find the index
-    # print 'The pixel at index %d,%d with colour %s is encrypted with part of your text' % (d.size / (len(d[0])*3), (d.size % (len(d[0])*3)) / len(d) ,colour)
-    # Would be fun if we say pixel at point[a,b] with colour = Green was altered
     return r2
 
 def generate_seed(m):
@@ -98,30 +86,16 @@ def encrypt_lsb(d, m, t):
     random.seed(generate_seed(m))
     
     r = []
-    
 
-    #process bar
-    bar = ProgressBar(widgets=['Encryption: ', AnimatedMarker()])
-    
-
-    for i in bar(range(len(t))):
-
-        #process bar update
-        time.sleep(0.001)
+    for i in range(len(t)):
         
-
         r2 = next_random(r, d)
         r.append(r2)
-        d.flat[r2] = (d.flat[r2] & ~1) | t[i]
-
-         
+        d.flat[r2] = (d.flat[r2] & ~1) | t[i]         
 
     print '[*] Finished Encryption'
     return d
 
-# process bar is not suitable for decrypt, 
-# as the text length much smaller than data size, 
-# alway stop like suddenly
 def decrypt_lsb(d, m):
     print '[*] Starting Decryption'
     random.seed(generate_seed(m))
@@ -146,7 +120,6 @@ def load_image( filename ) :
     img.load()
     data = np.asarray( img, dtype="int32" )
     return data
-    
 
 def save_image( npdata, outfilename ) :
     img = Image.fromarray( np.asarray( np.clip(npdata,0,255), dtype="uint8"), "RGB" )
@@ -160,15 +133,12 @@ def change_image_form(filename):
         filename = ''.join(f[:-1]) + '.png'
         img.save(os.path.join(__location__, filename))
     return filename
+
 def read_files(filename):
-    text = ""
-    try:
+    if os.path.exists(filename):
         with open(filename,'r') as f:
-            for line in f:
-                text += line#.replace('\n',' ')
-        return text
-    except Exception,e:
-        print str(e)
+           return ''.join([i for i in f])
+    return filename.split('/')[-1]
 
 
 def usage():
@@ -182,7 +152,10 @@ def usage():
     print ""
     print "Examples: "
     print "prng_stego.py -e -m pass test.png howareyou"
+    print 'python prng_stego.py -e -m magic test.png tester.sh'
+    print 'python prng_stego.py -e -m magic test.png file_test.txt'
     print 'prng_stego.py --encrypt --magic password test.png "howareyou  some other text"'
+    print ''
     print "prng_stego.py -d -m password test.png"
     print "prng_stego.py --decrypt --magic password test.png"
     sys.exit(0)
