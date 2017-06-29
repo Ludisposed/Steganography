@@ -67,24 +67,24 @@ def decrypt(filename, magic):
 
 
 def text_ascii(text):
-    return map(lambda x: '{:07b}'.format(ord(x)), text)
+    return map(lambda char: '{:07b}'.format(ord(char)), text)
 
 
-def ascii_text(a):
-    return chr(int(a, 2))
+def ascii_text(byte_char):
+    return chr(int(byte_char, 2))
 
 
-def next_random(r, d):
-    r2 = random.randint(0, d.size-1)
-    while r2 in r:
-        r2 = random.randint(0, d.size-1)
-    return r2
+def next_random(random_list, data):
+    next_random_number = random.randint(0, data.size-1)
+    while next_random_number in random_list:
+        next_random_number = random.randint(0, data.size-1)
+    return next_random_number
 
 
-def generate_seed(m):
+def generate_seed(magic):
     seed = 1
-    for i in m:
-        seed *= ord(i)
+    for char in magic:
+        seed *= ord(char)
     print '[*] Your magic number is %d' % seed
     return seed
 
