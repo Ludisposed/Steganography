@@ -54,3 +54,6 @@ stdbuf -oL python prng_stego.py -d -m A21ds0383ddvwe new_test.png |
       echo "$line"
     done
 echo ""
+
+read done
+

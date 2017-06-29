@@ -96,7 +96,7 @@ def encrypt_lsb(data, magic, text):
     random.seed(generate_seed(magic))
 
     random_list = []
-    for i in range(len(t)):
+    for i in range(len(text)):
         next_random_number = next_random(random_list, data)
         random_list.append(next_random_number)
         data.flat[next_random_number] = (data.flat[next_random_number] & ~1) | text[i]
@@ -113,7 +113,7 @@ def decrypt_lsb(data, magic):
     output = temp_char = ''
 
     for i in range(data.size):
-        next_random_number = next_random(r, data)
+        next_random_number = next_random(random_list, data)
         random_list.append(next_random_number)
         temp_char += str(data.flat[next_random_number] & 1)
         if len(temp_char) == 7:
@@ -151,7 +151,7 @@ def read_files(filename):
     if os.path.exists(filename):
         with open(filename, 'r') as f:
             return ''.join([i for i in f])
-    return filename.replace(__location__, '')
+    return filename.replace(__location__, '')[1:]
 
 
 def usage():
