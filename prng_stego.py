@@ -114,12 +114,11 @@ def decrypt_lsb(data, magic):
     for i in random_ints(data.size):
         temp_char += str(data.flat[i] & 1)
         if len(temp_char) == 7:
-            if int(temp_char) > 0:
-                output += ascii_text(temp_char)
-                temp_char = ''
-            else:
+            if int(temp_char) == 0:
                 print '[*] Finished Decryption'
                 return output
+            output += ascii_text(temp_char)
+            temp_char = ''
 
 
 def load_image(filename):
