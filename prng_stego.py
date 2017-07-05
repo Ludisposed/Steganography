@@ -31,9 +31,10 @@ def decrypt_text(password, token):
 
 
 def encrypt(filename, text, magic):
-    # check whether the text is a file name
-    if len(text.split('.')[1:]):
-        text = read_files(os.path.join(__location__, text))
+    if os.path.isfile(text):
+        with open(text, 'r') as f:
+            text = ''.join([i for i in f])
+
     t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7  # endbit
     try:
         # Change format to png
@@ -42,6 +43,7 @@ def encrypt(filename, text, magic):
         # Load Image
         d_old = load_image(filename)
 
+        print len(t), d_old.size
         # Check if image can contain the data
         if d_old.size < len(t):
             print '[*] Image not big enough'
@@ -74,11 +76,12 @@ def ascii_text(byte_char):
     return chr(int(byte_char, 2))
 
 
-def next_random(random_list, data):
-    next_random_number = random.randint(0, data.size-1)
-    while next_random_number in random_list:
-        next_random_number = random.randint(0, data.size-1)
-    return next_random_number
+# Gotto love generators
+def random_ints(size):
+    random_numbers = range(size)
+    random.shuffle(random_numbers)
+    for random_num in random_numbers:
+        yield random_num
 
 
 def generate_seed(magic):
@@ -95,12 +98,9 @@ def encrypt_lsb(data, magic, text):
     # We must alter the seed but for now lets make it simple
     random.seed(generate_seed(magic))
 
-    random_list = []
-    for i in range(len(text)):
-        next_random_number = next_random(random_list, data)
-        random_list.append(next_random_number)
-        data.flat[next_random_number] = (data.flat[next_random_number] & ~1) | text[i]
-
+    for char, i in zip(text, random_ints(data.size)):
+        data.flat[i] = (data.flat[i] & ~1) | char
+        
     print '[*] Finished Encryption'
     return data
 
@@ -109,13 +109,10 @@ def decrypt_lsb(data, magic):
     print '[*] Starting Decryption'
     random.seed(generate_seed(magic))
 
-    random_list = []
     output = temp_char = ''
 
-    for i in range(data.size):
-        next_random_number = next_random(random_list, data)
-        random_list.append(next_random_number)
-        temp_char += str(data.flat[next_random_number] & 1)
+    for i in random_ints(data.size):
+        temp_char += str(data.flat[i] & 1)
         if len(temp_char) == 7:
             if int(temp_char) > 0:
                 output += ascii_text(temp_char)
@@ -145,13 +142,6 @@ def change_image_form(filename):
         filename = ''.join(f[:-1]) + '.png'
         img.save(os.path.join(__location__, filename))
     return filename
-
-
-def read_files(filename):
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
-            return ''.join([i for i in f])
-    return filename.replace(__location__, '')[1:]
 
 
 def usage():
