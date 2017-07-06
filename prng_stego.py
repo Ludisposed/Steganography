@@ -50,7 +50,7 @@ def encrypt(filename, text, magic):
             sys.exit(0)
 
         # get new data and save to image
-        d_new = encrypt_lsb(d_old, magic, t)
+        d_new = hide_lsb(d_old, magic, t)
         save_image(d_new, 'new_'+filename)
     except Exception, e:
         print str(e)
@@ -62,7 +62,7 @@ def decrypt(filename, magic):
         data = load_image(filename)
 
         # Retrieve text
-        text = decrypt_lsb(data, magic)
+        text = retrieve_lsb(data, magic)
         print '[*] Retrieved text: \n%s' % decrypt_text(magic, text)
     except Exception, e:
         print str(e)
@@ -92,7 +92,7 @@ def generate_seed(magic):
     return seed
 
 
-def encrypt_lsb(data, magic, text):
+def hide_lsb(data, magic, text):
     print '[*] Starting Encryption'
 
     # We must alter the seed but for now lets make it simple
@@ -105,7 +105,7 @@ def encrypt_lsb(data, magic, text):
     return data
 
 
-def decrypt_lsb(data, magic):
+def retrieve_lsb(data, magic):
     print '[*] Starting Decryption'
     random.seed(generate_seed(magic))
 
