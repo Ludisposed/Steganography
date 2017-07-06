@@ -9,7 +9,6 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 
-
 # Set location of directory we are working in to load/save files
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -94,6 +93,12 @@ def generate_seed(magic):
 
 def hide_lsb(data, magic, text):
     print '[*] Starting Encryption'
+
+    # Does this actually improve anything except taking up time??
+    print '[*] Inserting fake data'
+    for i in random_ints(data.size):
+        data.flat[i] = (data.flat[i] & ~1) | random.randint(0,1)
+    print '[*] Done inserting'
 
     # We must alter the seed but for now lets make it simple
     random.seed(generate_seed(magic))
