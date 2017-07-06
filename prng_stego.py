@@ -35,6 +35,7 @@ def encrypt(filename, text, magic):
             text = ''.join([i for i in f])
 
     t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7  # endbit
+    print '[*] Encrypting text'
     try:
         # Change format to png
         filename = change_image_form(filename)
@@ -42,7 +43,6 @@ def encrypt(filename, text, magic):
         # Load Image
         d_old = load_image(filename)
 
-        print len(t), d_old.size
         # Check if image can contain the data
         if d_old.size < len(t):
             print '[*] Image not big enough'
@@ -62,6 +62,7 @@ def decrypt(filename, magic):
 
         # Retrieve text
         text = retrieve_lsb(data, magic)
+        print '[*] Decrypting text'
         print '[*] Retrieved text: \n%s' % decrypt_text(magic, text)
     except Exception, e:
         print str(e)
@@ -92,13 +93,13 @@ def generate_seed(magic):
 
 
 def hide_lsb(data, magic, text):
-    print '[*] Starting Encryption'
+    print '[*] Hiding message in image'
 
     # Does this actually improve anything except taking up time??
     print '[*] Inserting fake data'
     for i in random_ints(data.size):
         data.flat[i] = (data.flat[i] & ~1) | random.randint(0,1)
-    print '[*] Done inserting'
+    print '[*] Done inserting fake data'
 
     # We must alter the seed but for now lets make it simple
     random.seed(generate_seed(magic))
@@ -106,12 +107,12 @@ def hide_lsb(data, magic, text):
     for char, i in zip(text, random_ints(data.size)):
         data.flat[i] = (data.flat[i] & ~1) | char
         
-    print '[*] Finished Encryption'
+    print '[*] Finished hiding the message'
     return data
 
 
 def retrieve_lsb(data, magic):
-    print '[*] Starting Decryption'
+    print '[*] Retrieving message from image'
     random.seed(generate_seed(magic))
 
     output = temp_char = ''
@@ -120,11 +121,12 @@ def retrieve_lsb(data, magic):
         temp_char += str(data.flat[i] & 1)
         if len(temp_char) == 7:
             if int(temp_char) == 0:
-                print '[*] Finished Decryption'
+                print '[*] Finished retrieving'
                 return output
             output += ascii_text(temp_char)
             temp_char = ''
-
+    print '[*] Retrieving the message has failed'
+    return ''
 
 def load_image(filename):
     img = Image.open(os.path.join(__location__, filename))
