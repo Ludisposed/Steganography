@@ -28,13 +28,24 @@ def decrypt_text(password, token):
     f = Fernet(get_key(password))
     return f.decrypt(bytes(token))
 
+def check_image_space(data):
+    if data.size < len(t):
+        print '[*] Image not big enough'
+        sys.exit(0)
 
-def encrypt(filename, text, magic):
+def trans_file_to_text(text):
     if os.path.isfile(text):
         with open(text, 'r') as f:
             text = ''.join([i for i in f])
+    return text
 
-    t = [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7  # endbit
+def encode_text(text):
+    text = trans_file_to_text(text)
+    return [int(x) for x in ''.join(text_ascii(encrypt_text(magic, text)))] + [0]*7  # endbit
+
+def encrypt(filename, text, magic):
+
+    t = encode_text(text)
     print '[*] Encrypting text'
     try:
         # Change format to png
@@ -44,9 +55,7 @@ def encrypt(filename, text, magic):
         d_old = load_image(filename)
 
         # Check if image can contain the data
-        if d_old.size < len(t):
-            print '[*] Image not big enough'
-            sys.exit(0)
+        check_image_space(d_old)
 
         # get new data and save to image
         d_new = hide_lsb(d_old, magic, t)
@@ -91,15 +100,16 @@ def generate_seed(magic):
     print '[*] Your magic number is %d' % seed
     return seed
 
-
-def hide_lsb(data, magic, text):
-    print '[*] Hiding message in image'
-
-    # Does this actually improve anything except taking up time??
+def insert_fake_data(data):
     print '[*] Inserting fake data'
     for i in random_ints(data.size):
         data.flat[i] = (data.flat[i] & ~1) | random.randint(0,1)
     print '[*] Done inserting fake data'
+
+def hide_lsb(data, magic, text):
+    print '[*] Hiding message in image'
+
+    insert_fake_data(data)
 
     # We must alter the seed but for now lets make it simple
     random.seed(generate_seed(magic))
