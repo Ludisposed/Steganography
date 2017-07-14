@@ -26,9 +26,8 @@ A python steganography tool
 3. Make automated decryptor
 4. RSA-BASED-ENCRYPTION/DECRYPTION
 5. improve location of files, so we can work with files outside of the current directory
-6. complete ./setup
-7. refractor usability of the code....
+6. complete ./install
+7. #DONE# refractor usability of the code....
    - A python script that drives the command line tool
-   - A module that reads/writes files (although you could probably skip this because it is so simple, and let the command line tool manually read/write files)
    - A module that handles LSB encoding/decoding, and operates on an image array. It should make no attempt at encryption, but simply work with whatever data is passed, whether encrypted or not.
    - A separate module to handle encryption/decryption.

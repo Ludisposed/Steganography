@@ -3,40 +3,13 @@ import numpy as np
 import sys
 import os
 import getopt
-import base64
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
-import Steganography as steg
+import Steganography
+import Encryption
 
 
 # Set location of directory we are working in to load/save files
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-
-'''
-   Encryption methods as by Cryptography.fernet module
-'''
-def get_key(password):
-    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-    digest.update(password)
-    return base64.urlsafe_b64encode(digest.finalize())
-
-
-def encrypt_text(password, token):
-    f = Fernet(get_key(password))
-    return f.encrypt(bytes(token))
-
-
-def decrypt_text(password, token):
-    f = Fernet(get_key(password))
-    return f.decrypt(bytes(token))
-
-
-'''
-    Ecryption as by Cryptography.RSA module
-'''
-# RSA -- TODO
 
 '''
     Filehandling I/O stuff
@@ -89,7 +62,7 @@ def encrypt(filename, text, password, magic):
     # Optional encrypt
     if not password is None:
         print '[*] Encrypting text'
-        text = encrypt_text(password, text)
+        text = Encryption.encrypt_text(password, text)
 
     text = [int(x) for x in ''.join(text_ascii(text))] + [0]*7  # endbit
 
@@ -104,7 +77,7 @@ def encrypt(filename, text, password, magic):
         check_image_space(text,d_old)
        
         # get new data and save to image
-        d_new = steg.hide_lsb(d_old, magic, text)
+        d_new = Steganography.hide_lsb(d_old, magic, text)
         save_image(d_new, 'new_'+filename)
     except Exception, e:
         print str(e)
@@ -116,10 +89,13 @@ def decrypt(filename, password, magic):
         data = load_image(filename)
 
         # Retrieve text
-        text = steg.retrieve_lsb(data, magic)
+        text = Steganography.retrieve_lsb(data, magic)
+
+        # Optional Decrypt
         if not password is None:
             print '[*] Decrypting text'
-            text = decrypt_text(password, text)
+            text = Encryption.decrypt_text(password, text)
+        
         print '[*] Retrieved text: \n%s' % text
     except Exception, e:
         print str(e)
