@@ -54,6 +54,21 @@ stdbuf -oL python prng_stego.py -d -p ewvdd3830sd12A -m A21ds0383ddvwe new_test.
       echo "$line"
     done
 echo ""
-
-read done
+echo "TEST 4 -- no prng"
+echo "Encrypt test:"
+echo "python prng_stego.py -e -p ewvdd3830sd12A test.png tester.shksdgf"
+stdbuf -oL python prng_stego.py -e -p ewvdd3830sd12A test.png tester.shksdgf |
+    while IFS= read -r line
+    do
+      echo "$line"
+    done
+echo ""
+echo "Decrypt test:"
+echo "python prng_stego.py -d -p ewvdd3830sd12A new_test.png"
+stdbuf -oL python prng_stego.py -d -p ewvdd3830sd12A new_test.png |
+    while IFS= read -r line
+    do
+      echo "$line"
+    done
+echo ""
 
