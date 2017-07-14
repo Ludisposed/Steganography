@@ -15,7 +15,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 
 '''
-   Encryption methods as by Cryptography module
+   Encryption methods as by Cryptography.fernet module
 '''
 def get_key(password):
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
@@ -34,28 +34,9 @@ def decrypt_text(password, token):
 
 
 '''
-    Random methods
+    Ecryption as by Cryptography.RSA module
 '''
-text_ascii = lambda text: map(lambda char: '{:07b}'.format(ord(char)), text)
-
-
-def check_image_space(text,data):
-    if data.size < len(text):
-        print '[*] Image not big enough'
-        sys.exit(0)
-
-
-def trans_file_to_text(text):
-    if os.path.isfile(text):
-        with open(text, 'r') as f:
-            text = ''.join([i for i in f])
-    return text
-
-
-def encode_text(text):
-    text = trans_file_to_text(text)
-    return [int(x) for x in ''.join(text_ascii(encrypt_text(password, text)))] + [0]*7  # endbit
-
+# RSA -- TODO
 
 '''
     Filehandling I/O stuff
@@ -82,14 +63,36 @@ def change_image_form(filename):
     return filename
 
 
+def check_image_space(text,data):
+    if data.size < len(text):
+        print '[*] Image not big enough'
+        sys.exit(0)
+
+
+def trans_file_to_text(text):
+    if os.path.isfile(text):
+        with open(text, 'r') as f:
+            text = ''.join([i for i in f])
+    return text
+
+
 '''
     Main methods and usage
 '''
-def encrypt(filename, text, password, magic):
-    # We need to break it down!
-    t = encode_text(text)
+text_ascii = lambda text: map(lambda char: '{:07b}'.format(ord(char)), text)
 
-    print '[*] Encrypting text'
+
+def encrypt(filename, text, password, magic):
+    # Check for file!
+    text = trans_file_to_text(text)
+
+    # Optional encrypt
+    if not password is None:
+        print '[*] Encrypting text'
+        text = encrypt_text(password, text)
+
+    text = [int(x) for x in ''.join(text_ascii(text))] + [0]*7  # endbit
+
     try:
         # Change format to png
         filename = change_image_form(filename)
@@ -98,10 +101,10 @@ def encrypt(filename, text, password, magic):
         d_old = load_image(filename)
         
         # Check if image can contain the data
-        check_image_space(t,d_old)
+        check_image_space(text,d_old)
        
         # get new data and save to image
-        d_new = steg.hide_lsb(d_old, magic, t)
+        d_new = steg.hide_lsb(d_old, magic, text)
         save_image(d_new, 'new_'+filename)
     except Exception, e:
         print str(e)
@@ -114,8 +117,10 @@ def decrypt(filename, password, magic):
 
         # Retrieve text
         text = steg.retrieve_lsb(data, magic)
-        print '[*] Decrypting text'
-        print '[*] Retrieved text: \n%s' % decrypt_text(password, text)
+        if not password is None:
+            print '[*] Decrypting text'
+            text = decrypt_text(password, text)
+        print '[*] Retrieved text: \n%s' % text
     except Exception, e:
         print str(e)
 
@@ -126,8 +131,10 @@ def usage():
     print "Usage: prng_stego.py -e -p password -m magic filename text "
     print "-e --encrypt              - encrypt filename with text"
     print "-d --decrypt              - decrypt filename"
+    print ''
+    print 'Optionals'
     print "-p --password             - encrypt/decrypt with password"
-    print "-m --magic                - encrypt/decrypt with magic"
+    print "-m --magic                - hide/retrieve   with prng_magic"
     print ""
     print ""
     print "Examples: "
@@ -135,9 +142,11 @@ def usage():
     print 'python prng_stego.py -e -p password -m magic test.png tester.sh'
     print 'python prng_stego.py -e -p password -m magic test.png file_test.txt'
     print 'prng_stego.py --encrypt --password password --magic magic test.png "howareyou  some other text"'
+    print "prng_stego.py -e test.png howareyou"
     print ''
-    print "prng_stego.py -d -p password -m magic test.png"
-    print "prng_stego.py --decrypt --password password --magic magic test.png"
+    print "prng_stego.py -d -p password -m magic new_test.png"
+    print "prng_stego.py -d new_test.png"
+    print "prng_stego.py --decrypt --password password --magic magic new_test.png"
     sys.exit(0)
 
 if __name__ == "__main__":
