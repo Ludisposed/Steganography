@@ -28,7 +28,7 @@ def save_image(npdata, outfilename):
 
 def change_image_form(filename):
     f = filename.split('.')
-    if not (f[-1] == 'bmp' or f[-1] == 'BMP' or f[-1] == 'PNG' or f[-1] == 'png'):
+    if f[-1] not in ['bmp', 'BMP', 'PNG', 'png']:
         img = Image.open(os.path.join(__location__, filename))
         img.load()
         filename = ''.join(f[:-1]) + '.png'
@@ -52,10 +52,26 @@ def trans_file_to_text(text):
 '''
     Main methods and usage
 '''
-text_ascii = lambda text: map(lambda char: '{:07b}'.format(ord(char)), text)
+text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
+endbit = [0] * 7
 
+#!!! I can't put the docstrings into the function, with error:
+# 'unindent does not match any outer indentation level'
 
+'''
+    A method that hide text into image
+
+    Args:
+        filename (str) : The filename of the image
+        text     (str) : Text or text file need to be hide in image
+        password (str) : Used to encrypt text
+        magic    (str) : Used to hide text in image
+
+    Returns:
+        A image named new + filename, which with encrypted text in it
+'''
 def encrypt(filename, text, password, magic):
+
     # Check for file!
     text = trans_file_to_text(text)
 
@@ -64,7 +80,7 @@ def encrypt(filename, text, password, magic):
         print '[*] Encrypting text'
         text = Encryption.encrypt_text(password, text)
 
-    text = [int(x) for x in ''.join(text_ascii(text))] + [0]*7  # endbit
+    text = text_ascii(text) + endbit
 
     try:
         # Change format to png
@@ -82,8 +98,19 @@ def encrypt(filename, text, password, magic):
     except Exception, e:
         print str(e)
 
+'''
+	A method that decrypt text from image
 
+	Args:
+	    filename (str) : The filename of the image
+	    password (str) : Used to decrypt text
+	    magic    (str) : Used to retrieve text from image
+
+	Returns:
+	    Text hided in image
+'''
 def decrypt(filename, password, magic):
+    
     try:
         # Load image
         data = load_image(filename)
