@@ -15,7 +15,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
     Filehandling I/O stuff
 '''
 def load_image(filename):
-    img = Image.open(os.path.join(__location__, filename))
+    img = Image.open(os.path.join(PATH, filename))
     img.load()
     data = np.asarray(img, dtype="int32")
     return data
@@ -23,16 +23,16 @@ def load_image(filename):
 
 def save_image(npdata, outfilename): 
     img = Image.fromarray(np.asarray(np.clip(npdata, 0, 255), dtype="uint8"), "RGB")
-    img.save(os.path.join(__location__, outfilename))
+    img.save(os.path.join(PATH, outfilename))
 
 
 def change_image_form(filename):
     f = filename.split('.')
     if f[-1] not in ['bmp', 'BMP', 'PNG', 'png']:
-        img = Image.open(os.path.join(__location__, filename))
+        img = Image.open(os.path.join(PATH, filename))
         img.load()
         filename = ''.join(f[:-1]) + '.png'
-        img.save(os.path.join(__location__, filename))
+        img.save(os.path.join(PATH, filename))
     return filename
 
 
@@ -126,7 +126,13 @@ def decrypt(filename, password, magic):
         print '[*] Retrieved text: \n%s' % text
     except Exception, e:
         print str(e)
+def file_path_composition(filename):
+    if os.path.isfile(filename):
+        return os.path.split(filename)
+    return (__location__,filename)
+PATH = ""
 
+    
 
 def usage():
     print "Steganography prng-Tool @Ludisposed & @Qin"
@@ -179,10 +185,10 @@ if __name__ == "__main__":
     if to_encrypt is None:
         usage()
 
+    filename = args[0]
+    PATH, filename = file_path_composition(filename)
     if not to_encrypt:
-        filename = args[0]
         decrypt(filename, password, magic)
     else:
-        filename = args[0]
         text = args[1]
         encrypt(filename, text, password, magic)
