@@ -33,26 +33,26 @@ def load_key(filename):
     return private_key
 
    
-# Encrypt
-ciphertext = public_key.encrypt(
-    MESSAGE,
-    padding.OAEP(
-        mgf=padding.MGF1(algorithm=hashes.SHA1()),
-        algorithm=hashes.SHA1(),
-        label=None
+def encrypt_rsa(text):
+    return public_key.encrypt(
+        text,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+            algorithm=hashes.SHA1(),
+            label=None
+        )
     )
-)
 
 
-# Decrypt
-plaintext = private_key.decrypt(
-    ciphertext,
-    padding.OAEP(
-        mgf=padding.MGF1(algorithm=hashes.SHA1()),
-        algorithm=hashes.SHA1(),
-        label=None
+def decrypt_rsa(text):
+    return private_key.decrypt(
+        ciphertext,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+            algorithm=hashes.SHA1(),
+            label=None
+        )
     )
-)
 
 
 '''
