@@ -46,7 +46,7 @@ def encrypt_rsa(text, key):
 
 
 def decrypt_rsa(text):
-    public_key = load_key(key)
+    private_key = load_key(key)
     return private_key.decrypt(
         ciphertext,
         padding.OAEP(
