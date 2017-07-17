@@ -43,9 +43,12 @@ def check_image_space(text,data):
 
 
 def trans_file_to_text(text):
-    if os.path.isfile(text):
+    path,text = file_path_composition(text)
+    filename = os.path.join(path, text)
+    if os.path.isfile(filename) and os.path.exists(filename):
         with open(text, 'r') as f:
             text = ''.join([i for i in f])
+    
     return text
 
 
