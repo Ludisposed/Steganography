@@ -1,35 +1,28 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+import os
 
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-# RSA key generation
+# Working RSA encryption you can run for yourself
+MESSAGE = 'Ligula Venenatis Etiam Fermentum'
+
+# Create private key
 private_key = rsa.generate_private_key(
-     public_exponent=65537,
-     key_size=2048,
-     backend=default_backend()
+    public_exponent=65537,
+    key_size=2048,
+    backend=default_backend()
 )
 
-# RSA key loading
-with open("path/to/key.pem", "rb") as key_file:
-    private_key = serialization.load_pem_private_key(
-        key_file.read(),
-        password=None,
-        backend=default_backend()
-    )
+# Create public key
+public_key = private_key.public_key()
 
-# Key serialization
-pem = private_key.private_bytes(
-   encoding=serialization.Encoding.PEM,
-   format=serialization.PrivateFormat.PKCS8,
-   encryption_algorithm=serialization.BestAvailableEncryption(b'mypassword')
-)
-pem.splitlines()
-
-# RSA encryption using public key
-message = b"encrypted data"
+# Encrypt
 ciphertext = public_key.encrypt(
-    message,
+    MESSAGE,
     padding.OAEP(
         mgf=padding.MGF1(algorithm=hashes.SHA1()),
         algorithm=hashes.SHA1(),
@@ -37,7 +30,10 @@ ciphertext = public_key.encrypt(
     )
 )
 
-# RSA decryption using private key
+# Encrypted text
+print ciphertext
+
+# Decrypt
 plaintext = private_key.decrypt(
     ciphertext,
     padding.OAEP(
@@ -46,6 +42,18 @@ plaintext = private_key.decrypt(
         label=None
     )
 )
-plaintext == message
+
+# Decrypted text
+print plaintext
+
+# Make human readable key
+pem = private_key.private_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PrivateFormat.TraditionalOpenSSL,
+    encryption_algorithm=serialization.NoEncryption()
+)
+pem_data = pem.splitlines()
+print pem_data
 
 
+# How to Save//Load???
