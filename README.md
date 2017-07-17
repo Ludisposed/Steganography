@@ -23,11 +23,20 @@ A python steganography tool
 *Yet Another TODO*
 1. #DONE# Fake data
 2. #DONE# Rename as suggested
-3. Make automated decryptor
-4. RSA-BASED-ENCRYPTION/DECRYPTION
-5. improve location of files, so we can work with files outside of the current directory
-6. complete ./install
-7. #DONE# refractor usability of the code....
+3. #DONE# refractor usability of the code....
    - A python script that drives the command line tool
    - A module that handles LSB encoding/decoding, and operates on an image array. It should make no attempt at encryption, but simply work with whatever data is passed, whether encrypted or not.
    - A separate module to handle encryption/decryption.
+
+*Newest TODO*
+1. RSA-BASED-ENCRYPTION/DECRYPTION
+2. improve location of files, so we can work with files outside of the current directory
+3. complete ./install ---> Setup source controll
+     Example: 
+     stego/
+     |------Setup/Install
+     |------Test
+     |------stego
+          |--------module1.py
+          |--------module2.py
+          |-------- _init_.py
