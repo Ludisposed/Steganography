@@ -35,8 +35,13 @@ A python steganography tool
         Example: 
         stego/
         |------Setup/Install
+        
         |------Test
+        
         |------stego
               |--------module1.py
+              
               |--------module2.py
-              |-------- _init_.py
+              
+              |-------- __init__.py
+              
