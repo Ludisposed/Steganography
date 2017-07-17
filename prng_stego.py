@@ -54,8 +54,8 @@ def trans_file_to_text(text):
 '''
 text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
 
-# Nessecary?
-endbit = [0] * 7
+
+ENDBIT = [0] * 7
 
 
 def encrypt(filename, text, password, magic):
@@ -79,7 +79,7 @@ def encrypt(filename, text, password, magic):
         print '[*] Encrypting text'
         text = Encryption.encrypt_text(password, text)
 
-    text = text_ascii(text) + endbit
+    text = text_ascii(text) + ENDBIT
 
     try:
         # Change format to png

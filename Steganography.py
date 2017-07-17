@@ -47,12 +47,16 @@ def retrieve_lsb(data, magic):
     '''
     print '[*] Retrieving message from image'
 
-    output = temp_char = ''
+    retrieve_range = range(data.size)
     if not magic is None:
         random.seed(generate_seed(magic))
+        retrieve_range = random_ints(data.size)
 
-        # TODO: Make function for this
-        for i in random_ints(data.size):
+    return retrieve(data, retrieve_range)
+
+def retrieve(data, retrieve_range):
+    output = temp_char = ''
+    for i in retrieve_range:
             temp_char += str(data.flat[i] & 1)
             if len(temp_char) == 7:
                 if int(temp_char) == 0:
@@ -60,20 +64,8 @@ def retrieve_lsb(data, magic):
                     return output
                 output += ascii_text(temp_char)
                 temp_char = ''
-    else:
-        # TODO: Make function for this
-        for i in range(data.size):
-            temp_char += str(data.flat[i] & 1)
-            if len(temp_char) == 7:
-                if int(temp_char) == 0:
-                    print '[*] Finished retrieving'
-                    return output
-                output += ascii_text(temp_char)
-                temp_char = ''
-        
     print '[*] Retrieving the message has failed'
     return ''
-
 
 def generate_seed(magic):
     seed = 1
