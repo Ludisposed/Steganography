@@ -53,12 +53,13 @@ def trans_file_to_text(text):
     Main methods and usage
 '''
 text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
+
+# Nessecary?
 endbit = [0] * 7
 
-#!!! I can't put the docstrings into the function, with error:
-# 'unindent does not match any outer indentation level'
 
-'''
+def encrypt(filename, text, password, magic):
+    '''
     A method that hide text into image
 
     Args:
@@ -69,9 +70,7 @@ endbit = [0] * 7
 
     Returns:
         A image named new + filename, which with encrypted text in it
-'''
-def encrypt(filename, text, password, magic):
-
+    '''
     # Check for file!
     text = trans_file_to_text(text)
 
@@ -98,18 +97,19 @@ def encrypt(filename, text, password, magic):
     except Exception, e:
         print str(e)
 
-'''
-	A method that decrypt text from image
 
-	Args:
-	    filename (str) : The filename of the image
-	    password (str) : Used to decrypt text
-	    magic    (str) : Used to retrieve text from image
-
-	Returns:
-	    Text hided in image
-'''
 def decrypt(filename, password, magic):
+    '''
+    A method that decrypt text from image
+
+    Args:
+	filename (str) : The filename of the image
+  	password (str) : Used to decrypt text
+	magic    (str) : Used to retrieve text from image
+
+    Returns:
+	Text hided in image
+    '''
     
     try:
         # Load image
