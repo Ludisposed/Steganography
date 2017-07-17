@@ -1,26 +1,26 @@
 # Steganography
 A python steganography tool
 
-*DONE* *Main TODO*
+~~*Main TODO*~~
  - [x]  Main funtion to accept argument
  - [x]  A function what reads images and writes it to a byte-array
  - [x]  A Encoder function
  - [x]  A Decoder function
 
-*Also TODO*
+~~*Also TODO*~~
  - [x]  Encrypt the text
  - [x]  Add Code to randomize
      + Example -rgb rb # Changes only Red and Blue
      + Example -s 10   # Steps over 10 rbg arr and then changes~~
 
-*New TODO*
+~~*New TODO*~~
  - [x]  Add check if image has enough space for the string to hide
  - [x]  Make code more readable for other programmers PEP-8
  - [x]  Make more prints for users
  - [x]  improve seed method
  - [x]  **MAYBE** Add encryption from file... instead of text in command promt
 
-*Yet Another TODO*
+~~*Yet Another TODO*~~
  - [x]  Fake data
  - [x]  Rename as suggested
  - [x]  refractor usability of the code....
