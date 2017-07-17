@@ -13,7 +13,7 @@ function do_test() {
     echo ""
     echo "Decrypt test:"
     echo $2
-    stdbuf -$2 |
+    stdbuf oL -$2 |
     while IFS= read -r line
         do
           echo "$line"
