@@ -29,14 +29,14 @@ A python steganography tool
    - A separate module to handle encryption/decryption.
 
 *Newest TODO*
-1. RSA-BASED-ENCRYPTION/DECRYPTION
-2. improve location of files, so we can work with files outside of the current directory
-3. complete ./install ---> Setup source controll
-     Example: 
-     stego/
-     |------Setup/Install
-     |------Test
-     |------stego
-          |--------module1.py
-          |--------module2.py
-          |-------- _init_.py
+ - [ ]  RSA-BASED-ENCRYPTION/DECRYPTION
+ - [ ]  improve location of files, so we can work with files outside of the current directory
+ - [ ]  complete ./install ---> Setup source controll
+        Example: 
+        stego/
+        |------Setup/Install
+        |------Test
+        |------stego
+              |--------module1.py
+              |--------module2.py
+              |-------- _init_.py
