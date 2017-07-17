@@ -9,11 +9,24 @@ import Encryption
 
 # Set location of directory we are working in to load/save files
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+# Gets ascii representation from string to list of bits
+text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
+
+# Globals
+ENDBIT = [0] * 7
+PATH = ""
 
 
 '''
     Filehandling I/O stuff
 '''
+# I'm thinking is this needed? Try a file name without __location__ and see...
+def file_path_composition(filename):
+    if os.path.isfile(filename):
+        return os.path.split(filename)
+    return (__location__,filename)
+
+
 def load_image(filename):
     img = Image.open(os.path.join(PATH, filename))
     img.load()
@@ -55,12 +68,6 @@ def trans_file_to_text(text):
 '''
     Main methods and usage
 '''
-text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
-
-
-ENDBIT = [0] * 7
-
-
 def encrypt(filename, text, password, magic):
     '''
     A method that hide text into image
@@ -129,12 +136,6 @@ def decrypt(filename, password, magic):
         print '[*] Retrieved text: \n%s' % text
     except Exception, e:
         print str(e)
-def file_path_composition(filename):
-    if os.path.isfile(filename):
-        return os.path.split(filename)
-    return (__location__,filename)
-PATH = ""
-
     
 
 def usage():
