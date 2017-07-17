@@ -34,7 +34,8 @@ def load_key(filename):
 
    
 def encrypt_rsa(text, key):
-    public_key = load_key(key)
+    private_key = load_key(key)
+    public_key = private_key.public_key()
     return public_key.encrypt(
         text,
         padding.OAEP(
