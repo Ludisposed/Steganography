@@ -30,7 +30,7 @@ A python steganography tool
 
 *Newest TODO*
  - [ ]  RSA-BASED-ENCRYPTION/DECRYPTION
- - [ ]  improve location of files, so we can work with files outside of the current directory
+ - [x]  improve location of files, so we can work with files outside of the current directory
  - [ ]  complete ./install ---> Setup source controll
         Example: 
         
