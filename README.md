@@ -33,7 +33,9 @@ A python steganography tool
  - [ ]  improve location of files, so we can work with files outside of the current directory
  - [ ]  complete ./install ---> Setup source controll
         Example: 
+        
         stego/
+        
         |------Setup/Install
         
         |------Test
