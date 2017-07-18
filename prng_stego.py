@@ -8,7 +8,7 @@ import Encryption
 
 
 # Set location of directory we are working in to load/save files
-__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+#__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 # Gets ascii representation from string to list of bits
 text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
 
@@ -24,7 +24,7 @@ PATH = ""
 def file_path_composition(filename):
     if os.path.isfile(filename):
         return os.path.split(filename)
-    return (__location__,filename)
+    return ("",filename)
 
 
 def load_image(filename):
