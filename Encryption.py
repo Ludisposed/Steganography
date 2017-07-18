@@ -4,6 +4,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.asymmetric import padding
 import base64
 
 '''
@@ -46,10 +47,10 @@ def encrypt_rsa(text, key):
     )
 
 
-def decrypt_rsa(text):
+def decrypt_rsa(text, key):
     private_key = load_key(key)
     return private_key.decrypt(
-        ciphertext,
+        text,
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA1()),
             algorithm=hashes.SHA1(),
@@ -81,3 +82,11 @@ def decrypt_text(password, token):
     Ecryption as by Cryptography.RSA module
 '''
 # RSA -- TODO
+if __name__ == "__main__":
+    pk = gen_key()
+    filename = 'privkey.pem'
+    save_key(pk, filename)
+    e_data = encrypt_rsa("rsa_text", filename)
+    print "encrypt_rsa data: " + e_data
+    d_data = decrypt_rsa(e_data,filename)
+    print "decrypt_rsa data: " + d_data
