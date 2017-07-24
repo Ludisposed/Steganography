@@ -58,7 +58,7 @@ def retrieve(data, retrieve_range):
     output = temp_char = ''
     for i in retrieve_range:
             temp_char += str(data.flat[i] & 1)
-            if len(temp_char) == 7:
+            if len(temp_char) == 8:
                 if int(temp_char) == 0:
                     print '[*] Finished retrieving'
                     return output

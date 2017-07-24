@@ -32,5 +32,7 @@ echo "TEST 4 -- no prng"
 do_test "python2.7 prng_stego.py -e -p ewvdd3830sd12A test.png tester.shksdgf" "python2.7 prng_stego.py -d -p ewvdd3830sd12A new_test.png"
 echo "TEST 5 -- no opts just stego"
 do_test "python2.7 prng_stego.py -e test.png tester.shksdgf" "python2.7 prng_stego.py -d new_test.png"
-
+echo "TEST 6 -- RSA"
+do_test "python prng_stego.py -e -r new test.png tester.shksdgf" "python prng_stego.py -d --rsa private_key.pem new_test.png"
+read p
 

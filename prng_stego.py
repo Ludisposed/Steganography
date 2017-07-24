@@ -8,10 +8,10 @@ import Encryption
 
 
 # Gets ascii representation from string to list of bits
-text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:07b}'.format(ord(char)), text)))
+text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(char)), text)))
 
 # Globals
-ENDBIT = [0] * 7
+ENDBIT = [0] * 8
 PATH = ""
 
 
@@ -66,7 +66,7 @@ def trans_file_to_text(text):
 '''
     Main methods and usage
 '''
-def encrypt(filename, text, password, magic):
+def encrypt(filename, text, password, magic, rsa):
     '''
     A method that hide text into image
 
@@ -87,6 +87,16 @@ def encrypt(filename, text, password, magic):
         print '[*] Encrypting text'
         text = Encryption.encrypt_text(password, text)
 
+    if not rsa is None:
+        print '[*] Encrypting text'
+        if rsa == 'new':
+            new_key = Encryption.gen_key()
+            Encryption.save_key(new_key, 'private_key.pem')
+            text = Encryption.encrypt_rsa(text, 'private_key.pem')
+            print text
+        else:
+            text = Encryption.encrypt_rsa(text, rsa)            
+
     text = text_ascii(text) + ENDBIT
 
     try:
@@ -106,7 +116,7 @@ def encrypt(filename, text, password, magic):
         print str(e)
 
 
-def decrypt(filename, password, magic):
+def decrypt(filename, password, magic, rsa):
     '''
     A method that decrypt text from image
 
@@ -130,6 +140,11 @@ def decrypt(filename, password, magic):
         if not password is None:
             print '[*] Decrypting text'
             text = Encryption.decrypt_text(password, text)
+
+        if not rsa is None:
+            print '[*] Encrypting text'
+            print text
+            text = Encryption.decrypt_rsa(text, rsa)
         
         print '[*] Retrieved text: \n%s' % text
     except Exception, e:
@@ -164,12 +179,12 @@ if __name__ == "__main__":
     if not len(sys.argv[1:]):
         usage()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hedm:p:", ["help", "encrypt", "decrypt", "magic=", "password="])
+        opts, args = getopt.getopt(sys.argv[1:], "hedm:p:r:", ["help", "encrypt", "decrypt", "magic=", "password=", "rsa="])
     except getopt.GetoptError as err:
         print str(err)
         usage()
     
-    magic = to_encrypt = password = None
+    magic = to_encrypt = password = rsa = None
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
@@ -181,6 +196,8 @@ if __name__ == "__main__":
             magic = a
         elif o in ("-p", "--password"):
             password = a
+        elif o in ("-r", "--rsa"):
+            rsa = a
         else:
             assert False, "Unhandled Option"
 
@@ -189,8 +206,13 @@ if __name__ == "__main__":
 
     filename = args[0]
     PATH, filename = file_path_composition(filename)
+
+    if rsa and password:
+        print 'Specify Encryption technique either RSA or Password encrypted cannot have 2'
+        sys.exit(1)
+
     if not to_encrypt:
-        decrypt(filename, password, magic)
+        decrypt(filename, password, magic, rsa)
     else:
         text = args[1]
-        encrypt(filename, text, password, magic)
+        encrypt(filename, text, password, magic, rsa)
