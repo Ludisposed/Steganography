@@ -63,6 +63,18 @@ def trans_file_to_text(text):
     return text
 
 
+def check_rsa_key(text, filename):
+    succes = False
+    while not succes:
+        e_data = Encryption.encrypt_rsa(text, filename)
+        new = ''.join(map(lambda char: '{:08b}'.format(ord(char)), e_data))
+        succes = True
+        for i in range(0, len(new), 8):
+            if new[i:i+8] == '00000000':
+                succes = False
+    return map(int, new) + ENDBIT
+
+
 '''
     Main methods and usage
 '''
@@ -92,12 +104,15 @@ def encrypt(filename, text, password, magic, rsa):
         if rsa == 'new':
             new_key = Encryption.gen_key()
             Encryption.save_key(new_key, 'private_key.pem')
-            text = Encryption.encrypt_rsa(text, 'private_key.pem')
-            print text
-        else:
-            text = Encryption.encrypt_rsa(text, rsa)            
 
-    text = text_ascii(text) + ENDBIT
+            text = check_rsa_key(text, 'private_key.pem')
+            # text = Encryption.encrypt_rsa(text, 'private_key.pem')                    
+        else:
+            text = check_rsa_key(text, rsa)
+            # text = Encryption.encrypt_rsa(text, rsa)
+
+    if rsa is None:        
+        text = text_ascii(text) + ENDBIT    
 
     try:
         # Change format to png
@@ -140,10 +155,8 @@ def decrypt(filename, password, magic, rsa):
         if not password is None:
             print '[*] Decrypting text'
             text = Encryption.decrypt_text(password, text)
-
         if not rsa is None:
-            print '[*] Encrypting text'
-            print text
+            print '[*] Decrypting text'
             text = Encryption.decrypt_rsa(text, rsa)
         
         print '[*] Retrieved text: \n%s' % text
@@ -161,6 +174,7 @@ def usage():
     print 'Optionals'
     print "-p --password             - encrypt/decrypt with password"
     print "-m --magic                - hide/retrieve   with prng_magic"
+    print "-r --rsa                  - encrypt using RSA [filename of key]"
     print ""
     print ""
     print "Examples: "
@@ -169,7 +183,9 @@ def usage():
     print 'python prng_stego.py -e -p password -m magic test.png file_test.txt'
     print 'prng_stego.py --encrypt --password password --magic magic test.png "howareyou  some other text"'
     print "prng_stego.py -e test.png howareyou"
+    print "prng_stego.py -e -r new test.png howareyou"
     print ''
+    print "prng_stego.py -e --rsa private.pem new_test.png"
     print "prng_stego.py -d -p password -m magic new_test.png"
     print "prng_stego.py -d new_test.png"
     print "prng_stego.py --decrypt --password password --magic magic new_test.png"
@@ -208,7 +224,7 @@ if __name__ == "__main__":
     PATH, filename = file_path_composition(filename)
 
     if rsa and password:
-        print 'Specify Encryption technique either RSA or Password encrypted cannot have 2'
+        print 'Specify Encryption technique either RSA or Password'
         sys.exit(1)
 
     if not to_encrypt:
