@@ -29,7 +29,7 @@ A python steganography tool
    - A separate module to handle encryption/decryption.
 
 *Newest TODO*
- - [ ]  RSA-BASED-ENCRYPTION/DECRYPTION
+ - [x]  RSA-BASED-ENCRYPTION/DECRYPTION
  - [x]  improve location of files, so we can work with files outside of the current directory
  - [ ]  complete ./install ---> Setup source controll
         Example: 
@@ -46,4 +46,4 @@ A python steganography tool
               |--------module2.py
               
               |-------- __init__.py
-              
+- [ ]  Other formats like Video/Audio
