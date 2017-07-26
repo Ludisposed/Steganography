@@ -5,6 +5,8 @@ import os
 import getopt
 import Steganography
 import Encryption
+from classes.image_handler import ImageHandler
+from classes.text_handler import TextHandler
 
 
 # Gets ascii representation from string to list of bits
@@ -12,55 +14,17 @@ text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(
 
 # Globals
 ENDBIT = [0] * 8
-PATH = ""
 
 
 '''
     Filehandling I/O stuff
 '''
 
-def file_path_composition(filename):
-    if os.path.isfile(filename):
-        return os.path.split(filename)
-    return ("",filename)
-
-
-def load_image(filename):
-    img = Image.open(os.path.join(PATH, filename))
-    img.load()
-    data = np.asarray(img, dtype="int32")
-    return data
-
-
-def save_image(npdata, outfilename): 
-    img = Image.fromarray(np.asarray(np.clip(npdata, 0, 255), dtype="uint8"), "RGB")
-    img.save(os.path.join(PATH, outfilename))
-
-
-def change_image_form(filename):
-    f = filename.split('.')
-    if f[-1] not in ['bmp', 'BMP', 'PNG', 'png']:
-        img = Image.open(os.path.join(PATH, filename))
-        img.load()
-        filename = ''.join(f[:-1]) + '.png'
-        img.save(os.path.join(PATH, filename))
-    return filename
-
-
-def check_image_space(text,data):
+def check_space(text,data):
     if data.size < len(text):
         print '[*] Image not big enough'
         sys.exit(0)
 
-
-def trans_file_to_text(text):
-    path,text = file_path_composition(text)
-    filename = os.path.join(path, text)
-    if os.path.isfile(filename) and os.path.exists(filename):
-        with open(text, 'r') as f:
-            text = ''.join([i for i in f])
-    
-    return text
 
 
 def check_rsa_key(text, filename):
@@ -92,7 +56,7 @@ def encrypt(filename, text, password, magic, rsa):
         A image named new + filename, which with encrypted text in it
     '''
     # Check for file!
-    text = trans_file_to_text(text)
+    text = TextHandler(text).text
 
     # Optional encrypt
     if not password is None:
@@ -115,18 +79,17 @@ def encrypt(filename, text, password, magic, rsa):
         text = text_ascii(text) + ENDBIT    
 
     try:
-        # Change format to png
-        filename = change_image_form(filename)
+        image = ImageHandler(filename)
        
         # Load Image
-        d_old = load_image(filename)
+        d_old = image.load_image()
         
         # Check if image can contain the data
-        check_image_space(text,d_old)
+        check_space(text,d_old)
        
         # get new data and save to image
         d_new = Steganography.hide_lsb(d_old, magic, text)
-        save_image(d_new, 'new_'+filename)
+        image.save_image(d_new, 'new_'+filename)
     except Exception, e:
         print str(e)
 
@@ -145,8 +108,9 @@ def decrypt(filename, password, magic, rsa):
     '''
     
     try:
+        image = ImageHandler(filename)
         # Load image
-        data = load_image(filename)
+        data = image.load_image()
 
         # Retrieve text
         text = Steganography.retrieve_lsb(data, magic)
@@ -221,7 +185,6 @@ if __name__ == "__main__":
         usage()
 
     filename = args[0]
-    PATH, filename = file_path_composition(filename)
 
     if rsa and password:
         print 'Specify Encryption technique either RSA or Password'
