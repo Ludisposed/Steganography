@@ -5,8 +5,8 @@ import os
 import getopt
 import Steganography
 import Encryption
-from classes.image_handler import ImageHandler
-from classes.text_handler import TextHandler
+from classes import ImageHandler
+from classes import TextHandler
 
 
 # Gets ascii representation from string to list of bits
