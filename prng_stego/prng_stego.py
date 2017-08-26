@@ -5,6 +5,7 @@ import os
 import getopt
 import Steganography
 import Encryption
+import argparse
 from classes import ImageHandler
 from classes import TextHandler
 
@@ -127,6 +128,15 @@ def decrypt(filename, password, magic, rsa):
     except Exception, e:
         print str(e)
     
+def parse_options():
+    parser = argparse.ArgumentParser(usage='%(prog)s <-e/-d> [options] <image_file_path> [<encrypt_text/encrypt_text_path>]',
+                                     description='Steganography prng-Tool @Ludisposed & @Qin')
+    parser.add_argument('-e','--encrypt',help='encrypt filename with text')
+    parser.add_argument('-d','--decrypt',help='decrypt filename')
+    parser.add_argument('-p','--password',help='encrypt/decrypt with password')
+    parser.add_argument('-m','--magic',help='hide/retrieve   with prng_magic')
+    parser.add_argument('-r','--rsa',help='encrypt using RSA [filename of key]')
+
 
 def usage():
     print "Steganography prng-Tool @Ludisposed & @Qin"
