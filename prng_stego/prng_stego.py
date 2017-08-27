@@ -132,7 +132,7 @@ def parse_options():
     parser = argparse.ArgumentParser(usage='%(prog)s [options] <filename>',
                                      description='Steganography prng-Tool @Ludisposed & @Qin',
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
-                                     usage=
+                                     epilog=
 '''
 Examples:
 python prng_stego.py -e test.png -t howareyou
