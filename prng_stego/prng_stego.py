@@ -129,79 +129,49 @@ def decrypt(filename, password, magic, rsa):
         print str(e)
     
 def parse_options():
-    parser = argparse.ArgumentParser(usage='%(prog)s <-e/-d> [options] <image_file_path> [<encrypt_text/encrypt_text_path>]',
-                                     description='Steganography prng-Tool @Ludisposed & @Qin')
-    parser.add_argument('-e','--encrypt',help='encrypt filename with text')
-    parser.add_argument('-d','--decrypt',help='decrypt filename')
-    parser.add_argument('-p','--password',help='encrypt/decrypt with password')
-    parser.add_argument('-m','--magic',help='hide/retrieve   with prng_magic')
-    parser.add_argument('-r','--rsa',help='encrypt using RSA [filename of key]')
+    parser = argparse.ArgumentParser(usage='%(prog)s [options] <filename>',
+                                     description='Steganography prng-Tool @Ludisposed & @Qin',
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     usage=
+'''
+Examples:
+python prng_stego.py -e test.png -t howareyou
+python prng_stego.py -e -r new test.png howareyou
+python prng_stego.py -e -p password -m magic test.png -t howareyou
+python prng_stego.py -e -p password -m magic test.png -t file_test.txt
+python prng_stego.py --encrypt --password password --magic magic test.png -t "howareyou  some other text"
 
+python prng_stego.py -d new_test.png
+python prng_stego.py -d --rsa private.pem new_test.png
+python prng_stego.py -d -p password -m magic new_test.png
+python prng_stego.py --decrypt --password password --magic magic new_test.png
 
-def usage():
-    print "Steganography prng-Tool @Ludisposed & @Qin"
-    print ""
-    print "Usage: prng_stego.py -e -p password -m magic filename text "
-    print "-e --encrypt              - encrypt filename with text"
-    print "-d --decrypt              - decrypt filename"
-    print ''
-    print 'Optionals'
-    print "-p --password             - encrypt/decrypt with password"
-    print "-m --magic                - hide/retrieve   with prng_magic"
-    print "-r --rsa                  - encrypt using RSA [filename of key]"
-    print ""
-    print ""
-    print "Examples: "
-    print "prng_stego.py -e -p password -m magic test.png howareyou"
-    print 'python prng_stego.py -e -p password -m magic test.png tester.sh'
-    print 'python prng_stego.py -e -p password -m magic test.png file_test.txt'
-    print 'prng_stego.py --encrypt --password password --magic magic test.png "howareyou  some other text"'
-    print "prng_stego.py -e test.png howareyou"
-    print "prng_stego.py -e -r new test.png howareyou"
-    print ''
-    print "prng_stego.py -e --rsa private.pem new_test.png"
-    print "prng_stego.py -d -p password -m magic new_test.png"
-    print "prng_stego.py -d new_test.png"
-    print "prng_stego.py --decrypt --password password --magic magic new_test.png"
-    sys.exit(0)
+'''
+
+                                        )
+    parser.add_argument('-e','--encrypt', action="store_true", help='encrypt filename with text')
+    parser.add_argument('-d','--decrypt', action="store_true", help='decrypt text from filename')
+    parser.add_argument('-p','--password', type=str, help='encrypt/decrypt with password')
+    parser.add_argument('-m','--magic', type=str, help='hide/retrieve with prng_magic')
+    parser.add_argument('-r','--rsa', type=str, help='encrypt using RSA [filename of key]')
+    parser.add_argument('filename', type=str, help='encrypt/decrypt message into this [image/audio/video]')
+    parser.add_argument('-t','--text', type=str, help='[text/text_path] used to encrypt')
+    args = parser.parse_args()
+
+    if args.encrypt ^ args.decrypt == False:
+        parser.error('Incorrect encrypt/decrypt mode')
+    else:
+        if args.encrypt:
+            if args.text == None:
+                parser.error('Require text/text.path in encrypt mode')
+    if args.password != None and args.rsa != None:
+        parser.error('Specify Encryption/Decryption technique either RSA or Password')
+    return args
 
 if __name__ == "__main__":
-    if not len(sys.argv[1:]):
-        usage()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hedm:p:r:", ["help", "encrypt", "decrypt", "magic=", "password=", "rsa="])
-    except getopt.GetoptError as err:
-        print str(err)
-        usage()
-    
-    magic = to_encrypt = password = rsa = None
-    for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-        elif o in ("-e", "--encrypt"):
-            to_encrypt = True
-        elif o in ("-d", "--decrypt"):
-            to_encrypt = False
-        elif o in ("-m", "--magic"):
-            magic = a
-        elif o in ("-p", "--password"):
-            password = a
-        elif o in ("-r", "--rsa"):
-            rsa = a
-        else:
-            assert False, "Unhandled Option"
-
-    if to_encrypt is None:
-        usage()
-
-    filename = args[0]
-
-    if rsa and password:
-        print 'Specify Encryption technique either RSA or Password'
-        sys.exit(1)
-
-    if not to_encrypt:
-        decrypt(filename, password, magic, rsa)
+    args = parse_options()
+    if args.encrypt:
+        encrypt(args.filename, args.text, args.password, args.magic, args.rsa)
     else:
-        text = args[1]
-        encrypt(filename, text, password, magic, rsa)
+        decrypt(args.filename, args.password, args.magic, args.rsa)
+    
