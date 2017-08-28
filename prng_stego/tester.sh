@@ -22,15 +22,14 @@ function do_test() {
 }
 
 echo "TEST 1 -- normal from file"
-do_test "python prng_stego.py -e -p pass -m magic test.png file_test.txt" "python prng_stego.py -d -p pass -m magic new_test.png"
+do_test "python prng_stego.py -e -p pass -m magic -t file_test.txt test.png " "python prng_stego.py -d -p pass -m magic new_test.png"
 echo "TEST 2 -- fail file"
-do_test "python prng_stego.py -e -p somelongasspassword12345 -m somelongasspassword12345 test.png file_test.txt.incorrect"  "python prng_stego.py -d -p somelongasspassword12345 -m somelongasspassword12345 new_test.png"
+do_test "python prng_stego.py -e -p somelongasspassword12345 -m somelongasspassword12345 -t file_test.txt.incorrect test.png"  "python prng_stego.py -d -p somelongasspassword12345 -m somelongasspassword12345 new_test.png"
 echo "TEST 3 -- Long file input"
-do_test "python prng_stego.py -e -p ewvdd3830sd12A -m A21ds0383ddvwe test.png tester.sh"  "python prng_stego.py -d -p ewvdd3830sd12A -m A21ds0383ddvwe new_test.png"
+do_test "python prng_stego.py -e -p ewvdd3830sd12A -m A21ds0383ddvwe -t tester.sh test.png"  "python prng_stego.py -d -p ewvdd3830sd12A -m A21ds0383ddvwe new_test.png"
 echo "TEST 4 -- no prng"
-do_test "python prng_stego.py -e -p ewvdd3830sd12A test.png tester.shksdgf" "python prng_stego.py -d -p ewvdd3830sd12A new_test.png"
+do_test "python prng_stego.py -e -p ewvdd3830sd12A -t tester.shksdgf test.png" "python prng_stego.py -d -p ewvdd3830sd12A new_test.png"
 echo "TEST 5 -- no opts just stego"
-do_test "python prng_stego.py -e test.png tester.shksdgf" "python prng_stego.py -d new_test.png"
+do_test "python prng_stego.py -e -t tester.shksdgf test.png" "python prng_stego.py -d new_test.png"
 echo "TEST 6 -- RSA"
-do_test "python prng_stego.py -e -r new test.png tester.shksdgf" "python prng_stego.py -d --rsa private_key.pem new_test.png"
-read p
+do_test "python prng_stego.py -e -r new -t tester.shksdgf test.png" "python prng_stego.py -d --rsa private_key.pem new_test.png"
