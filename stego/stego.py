@@ -1,14 +1,13 @@
-from PIL import Image
-import numpy as np
+from helpers import steganography
+from helpers import encryption
+from helpers import file_handler
+
 import sys
 import os
-import getopt
-import Steganography
-import Encryption
-import argparse
-from classes import ImageHandler
-from classes import TextHandler
 
+import numpy as np
+from PIL import Image
+import argparse
 
 # Gets ascii representation from string to list of bits
 text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(char)), text)))
@@ -31,7 +30,7 @@ def check_space(text,data):
 def check_rsa_key(text, filename):
     succes = False
     while not succes:
-        e_data = Encryption.encrypt_rsa(text, filename)
+        e_data = encryption.encrypt_rsa(text, filename)
         new = ''.join(map(lambda char: '{:08b}'.format(ord(char)), e_data))
         succes = True
         for i in range(0, len(new), 8):
@@ -57,18 +56,18 @@ def encrypt(filename, text, password, magic, rsa):
         A image named new + filename, which with encrypted text in it
     '''
     # Check for file!
-    text = TextHandler(text).text
+    text = file_handler.TextHandler(text).text
 
     # Optional encrypt
     if not password is None:
         print '[*] Encrypting text'
-        text = Encryption.encrypt_text(password, text)
+        text = encryption.encrypt_text(password, text)
 
     if not rsa is None:
         print '[*] Encrypting text'
         if rsa == 'new':
-            new_key = Encryption.gen_key()
-            Encryption.save_key(new_key, 'private_key.pem')
+            new_key = encryption.gen_key()
+            encryption.save_key(new_key, 'private_key.pem')
 
             text = check_rsa_key(text, 'private_key.pem')
             # text = Encryption.encrypt_rsa(text, 'private_key.pem')                    
@@ -80,7 +79,7 @@ def encrypt(filename, text, password, magic, rsa):
         text = text_ascii(text) + ENDBIT    
 
     try:
-        image = ImageHandler(filename)
+        image = file_handler.ImageHandler(filename)
        
         # Load Image
         d_old = image.load_image()
@@ -89,8 +88,8 @@ def encrypt(filename, text, password, magic, rsa):
         check_space(text,d_old)
        
         # get new data and save to image
-        d_new = Steganography.hide_lsb(d_old, magic, text)
-        image.save_image(d_new, 'new_'+filename)
+        d_new = steganography.hide_lsb(d_old, magic, text)
+        image.save_image(d_new, 'new_' + image.filename)
     except Exception, e:
         print str(e)
 
@@ -109,20 +108,20 @@ def decrypt(filename, password, magic, rsa):
     '''
     
     try:
-        image = ImageHandler(filename)
+        image = file_handler.ImageHandler(filename)
         # Load image
         data = image.load_image()
 
         # Retrieve text
-        text = Steganography.retrieve_lsb(data, magic)
+        text = steganography.retrieve_lsb(data, magic)
 
         # Optional Decrypt
         if not password is None:
             print '[*] Decrypting text'
-            text = Encryption.decrypt_text(password, text)
+            text = encryption.decrypt_text(password, text)
         if not rsa is None:
             print '[*] Decrypting text'
-            text = Encryption.decrypt_rsa(text, rsa)
+            text = encryption.decrypt_rsa(text, rsa)
         
         print '[*] Retrieved text: \n%s' % text
     except Exception, e:
@@ -160,11 +159,9 @@ python prng_stego.py --decrypt --password password --magic magic new_test.png
 
     if args.encrypt ^ args.decrypt == False:
         parser.error('Incorrect encrypt/decrypt mode')
-    else:
-        if args.encrypt:
-            if args.text == None:
-                parser.error('Require text/text.path in encrypt mode')
-    if args.password != None and args.rsa != None:
+    if args.encrypt and args.text is None:
+        parser.error('Require text/text.path in encrypt mode')
+    if not args.password is None and not args.rsa is None:
         parser.error('Specify Encryption/Decryption technique either RSA or Password')
     return args
 

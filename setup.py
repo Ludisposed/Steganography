@@ -10,17 +10,18 @@ def get_file(*paths):
             return f.read().decode('utf8')
     except IOError:
         pass
+
 def get_version():
-    init_py = get_file(os.path.dirname(__file__), 'prng_stego', '__init__.py')
+    init_py = get_file(os.path.dirname(__file__), 'stego', '__init__.py')
     pattern = r"{0}\W*=\W*'([^']+)'".format('__version__')
     version, = re.findall(pattern, init_py)
     return version
 
 def install():
 	setup(
-		name='prng_stego',                      
+		name='stego',                      
 		version=get_version(),                    
-		packages = find_packages(exclude=['tester','tester_mac']),
-		scripts=['prng_stego'],
-		install_requires=['Pillow','cryptography','numpy'],             
+		packages = find_packages(exlude('stego_test.py')),
+		scripts=['stego'],
+		install_requires=['Pillow', 'cryptography', 'numpy'],             
       )

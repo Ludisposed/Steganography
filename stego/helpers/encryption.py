@@ -76,26 +76,3 @@ def encrypt_text(password, token):
 def decrypt_text(password, token):
     f = Fernet(get_key(password))
     return f.decrypt(bytes(token))
-
-'''
-# RSA -- TODO
-if __name__ == "__main__":
-    pk = gen_key()
-    filename = 'privkey.pem'
-    save_key(pk, filename)
-
-    succes = False
-    while not succes:
-        e_data = encrypt_rsa("Such a long text to encrypt with RSA I do not know how to", filename)
-        print "encrypt_rsa data: " + e_data
-        new = ''.join(map(lambda char: '{:08b}'.format(ord(char)), e_data))
-        succes = True
-        for i in range(0, len(new), 8):
-            if new[i:i+8] == '00000000':
-                print 'Key is bad'
-                print new[i:i+8]
-                succes = False
-
-    d_data = decrypt_rsa(e_data,filename)
-    print "decrypt_rsa data: " + d_data
-'''
