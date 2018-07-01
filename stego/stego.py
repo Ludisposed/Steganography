@@ -15,33 +15,6 @@ text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(
 # Globals
 ENDBIT = [0] * 8
 
-
-'''
-    Filehandling I/O stuff
-'''
-
-def check_space(text,data):
-    if data.size < len(text):
-        print '[*] Image not big enough'
-        sys.exit(0)
-
-
-
-def check_rsa_key(text, filename):
-    succes = False
-    while not succes:
-        e_data = encryption.encrypt_rsa(text, filename)
-        new = ''.join(map(lambda char: '{:08b}'.format(ord(char)), e_data))
-        succes = True
-        for i in range(0, len(new), 8):
-            if new[i:i+8] == '00000000':
-                succes = False
-    return map(int, new) + ENDBIT
-
-
-'''
-    Main methods and usage
-'''
 def encrypt(filename, text, password, magic, rsa):
     '''
     A method that hide text into image
@@ -57,43 +30,25 @@ def encrypt(filename, text, password, magic, rsa):
     '''
     # Check for file!
     text = file_handler.TextHandler(text).text
+    print '[*] Encrypting text'
 
     # Optional encrypt
     if not password is None:
-        print '[*] Encrypting text'
         text = encryption.encrypt_text(password, text)
 
     if not rsa is None:
-        print '[*] Encrypting text'
-        if rsa == 'new':
-            new_key = encryption.gen_key()
-            encryption.save_key(new_key, 'private_key.pem')
+        text = encryption.check_rsa_key(text, rsa) + ENDBIT
+    
+    if rsa is None:
+        text = text_ascii(text) + ENDBIT
 
-            text = check_rsa_key(text, 'private_key.pem')
-            # text = Encryption.encrypt_rsa(text, 'private_key.pem')                    
-        else:
-            text = check_rsa_key(text, rsa)
-            # text = Encryption.encrypt_rsa(text, rsa)
-
-    if rsa is None:        
-        text = text_ascii(text) + ENDBIT    
-
-    try:
-        image = file_handler.ImageHandler(filename)
+    image = file_handler.ImageHandler(filename)
+    d_old = image.load_image()
        
-        # Load Image
-        d_old = image.load_image()
-        
-        # Check if image can contain the data
-        check_space(text,d_old)
-       
-        # get new data and save to image
-        d_new = steganography.hide_lsb(d_old, magic, text)
-        image.save_image(d_new, 'new_' + image.filename)
-    except Exception, e:
-        print str(e)
-
-
+    # get new data and save to image
+    d_new = steganography.hide_lsb(d_old, magic, text)
+    image.save_image(d_new, 'new_' + image.filename)
+    
 def decrypt(filename, password, magic, rsa):
     '''
     A method that decrypt text from image
@@ -107,25 +62,21 @@ def decrypt(filename, password, magic, rsa):
 	Text hided in image
     '''
     
-    try:
-        image = file_handler.ImageHandler(filename)
-        # Load image
-        data = image.load_image()
+    image = file_handler.ImageHandler(filename)
+    # Load image
+    data = image.load_image()
 
-        # Retrieve text
-        text = steganography.retrieve_lsb(data, magic)
+    # Retrieve text
+    text = steganography.retrieve_lsb(data, magic)
+    print '[*] Decrypting text'
 
-        # Optional Decrypt
-        if not password is None:
-            print '[*] Decrypting text'
-            text = encryption.decrypt_text(password, text)
-        if not rsa is None:
-            print '[*] Decrypting text'
-            text = encryption.decrypt_rsa(text, rsa)
+    # Optional Decrypt
+    if not password is None:
+        text = encryption.decrypt_text(password, text)
+    if not rsa is None:
+        text = encryption.decrypt_rsa(text, rsa)
         
-        print '[*] Retrieved text: \n%s' % text
-    except Exception, e:
-        print str(e)
+    print '[*] Retrieved text: \n%s' % text
     
 def parse_options():
     parser = argparse.ArgumentParser(usage='%(prog)s [options] <filename>',

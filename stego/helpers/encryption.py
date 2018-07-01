@@ -7,16 +7,11 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric import padding
 import base64
 
+ENDBIT = [0] * 8
+
 '''
     Ecryption as by Cryptography.RSA module
 '''
-def gen_key():
-    private_key = rsa.generate_private_key(
-        public_exponent=65537, key_size=2048, backend=default_backend()
-    )
-    return private_key
-
-
 def save_key(pk, filename):
     pem = pk.private_bytes(
         encoding=serialization.Encoding.PEM,
@@ -35,8 +30,7 @@ def load_key(filename):
 
    
 def encrypt_rsa(text, key):
-    private_key = load_key(key)
-    public_key = private_key.public_key()
+    public_key = load_key(key).public_key()
     return public_key.encrypt(
         text,
         padding.OAEP(
@@ -46,6 +40,17 @@ def encrypt_rsa(text, key):
         )
     )
 
+def check_rsa_key(text, rsa):
+    end = ''.join(map(str, ENDBIT))
+    succes = False
+    while not succes:
+        e_data = encrypt_rsa(text, rsa)
+        new = ''.join(map(lambda char: '{:08b}'.format(ord(char)), e_data))
+        succes = True
+        for i in range(0, len(new), 8):
+            if new[i:i+8] == end:
+                succes = False
+    return map(int, new)
 
 def decrypt_rsa(text, key):
     private_key = load_key(key)
