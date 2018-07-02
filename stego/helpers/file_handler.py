@@ -1,7 +1,9 @@
 import os
 from PIL import Image
+import cv2
 import numpy as np
 import sys
+import skvideo.io
 
 class FileHandler(object):
     def __init__(self, filename):
@@ -48,3 +50,28 @@ class ImageHandler(FileHandler):
 	    img.load()
 	    self.filename = ''.join(f[:-1]) + '.png'
 	    img.save(os.path.join(self.path, self.filename))
+class VideoHandler(FileHandler):
+    def __init__(self, filename):
+        FileHandler.__init__(self, filename)
+
+    def load_video(self):
+        file_path = os.path.join(self.path, self.filename)
+
+        vid = skvideo.io.FFmpegReader(file_path)
+        data = skvideo.io.ffprobe(file_path)['video']
+        rate = data['@r_frame_rate']
+        return vid, rate
+
+    def save_video(self, frames, rate, new_filename='new_video.avi'):
+        writer = skvideo.io.FFmpegWriter(os.path.join(self.path, new_filename),
+                                         inputdict={
+                                                    '-r': rate,
+                                         }, 
+                                         outputdict={
+                                                    '-vcodec': 'libx264', 
+                                                    '-b': '300000000',
+                                                    '-r': rate,
+                                         })
+        for frame in frames:
+            writer.writeFrame(frame.astype(np.uint8))
+        writer.close()

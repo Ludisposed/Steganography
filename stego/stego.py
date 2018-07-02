@@ -15,24 +15,24 @@ text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(
 # Globals
 ENDBIT = [0] * 8
 
+#TODO Specify out filename
 def encrypt(filename, text, password, magic, rsa):
     '''
     A method that hide text into image
 
     Args:
         filename (str) : The filename of the image
-        text     (str) : Text or text file need to be hide in image
-        password (str) : Used to encrypt text
-        magic    (str) : Used to hide text in image
+        text     (str) : Text or textfile to be hidden in the image
+        password (str) : Password used to encrypt text
+        magic    (str) : Magic Password used to use for pseudorandomness to hide text in the image
+        rsa      (str) : RSA public key to encrypt the text
 
     Returns:
         A image named new + filename, which with encrypted text in it
     '''
-    # Check for file!
     text = file_handler.TextHandler(text).text
     print '[*] Encrypting text'
 
-    # Optional encrypt
     if not password is None:
         text = encryption.encrypt_text(password, text)
 
@@ -42,13 +42,13 @@ def encrypt(filename, text, password, magic, rsa):
     if rsa is None:
         text = text_ascii(text) + ENDBIT
 
+    #TODO Check for format and switch between Image, Video, (Audio... eventually)
     image = file_handler.ImageHandler(filename)
     d_old = image.load_image()
-       
-    # get new data and save to image
     d_new = steganography.hide_lsb(d_old, magic, text)
     image.save_image(d_new, 'new_' + image.filename)
-    
+
+#TODO Specify outfilename
 def decrypt(filename, password, magic, rsa):
     '''
     A method that decrypt text from image
@@ -56,21 +56,19 @@ def decrypt(filename, password, magic, rsa):
     Args:
 	filename (str) : The filename of the image
   	password (str) : Used to decrypt text
-	magic    (str) : Used to retrieve text from image
+        magic    (str) : Magic Password used to use for pseudorandomness to retrieve text in the image
+        rsa      (str) : RSA private key to decrypt the text
 
     Returns:
 	Text hided in image
     '''
     
+    #TODO Check for format and switch between Image, Video, (Audio... eventually)
     image = file_handler.ImageHandler(filename)
-    # Load image
     data = image.load_image()
-
-    # Retrieve text
     text = steganography.retrieve_lsb(data, magic)
     print '[*] Decrypting text'
 
-    # Optional Decrypt
     if not password is None:
         text = encryption.decrypt_text(password, text)
     if not rsa is None:
