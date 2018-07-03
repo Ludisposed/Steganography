@@ -4,33 +4,34 @@ import numpy as np
 
 text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(char)), text)))
 text = text_ascii("Some fucking text you know it") + [0] * 8
-vid = file_handler.VideoHandler('/root/Videos/video.webm')
+vid = file_handler.VideoHandler('video.mov')
 
 INP = []
 OUT = []
 
 def encode_video(vid):
     global INP
-    vid, rate = vid.load_video()
-    frames = []
-    for idx, frame in enumerate(vid.nextFrame()):
+    frames, fps = vid.load_video()
+    new_frames = []
+    for frame in frames:
         new_frame = steganography.hide_lsb(frame, None, text)
-        frames.append(new_frame)
+        new_frames.append(new_frame)
         INP.append(new_frame)
-    return frames, rate
+
+    return new_frames, fps
 
 def decode_video(vid):
     global OUT
-    vid, rate = vid.load_video()
-    for idx, frame in enumerate(vid.nextFrame()):
+    frames, fps = vid.load_video()
+    for frame in frames:
         OUT.append(frame)
         text = steganography.retrieve_lsb(frame, None)
         print(text)
 
-frames, rate = encode_video(vid)
-vid.save_video(frames, rate)
+frames, fps = encode_video(vid)
+vid.save_video(frames, fps)
 
-rev_vid = file_handler.VideoHandler('/root/Videos/new_video.avi')
+rev_vid = file_handler.VideoHandler('new_video.avi')
 decode_video(rev_vid)
 
 for a, b in zip(INP, OUT):
