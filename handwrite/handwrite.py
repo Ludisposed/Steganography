@@ -3,17 +3,22 @@
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-img = Image.open("wtest.png")
-img.load()
-#print img.getbands()
-r, g, b, a = img.split()
+'''
+TODO: 
+1. Detect best(darkest) place to write
+2. can be write in different band, so detect the best band(to write per letter)
+'''
 
-# draw = ImageDraw.Draw(b)
-# fnt = ImageFont.truetype('/Library/Fonts/Arial.ttf', 400)
-# draw.text((10,10), "Hello", font=fnt, fill="#ffffff")
-draw = ImageDraw.Draw(r)
-fnt = ImageFont.truetype('/Library/Fonts/Arial.ttf', 20)
-draw.text((10,10), "Hello", font=fnt, fill="#eeeeee")
 
-pic=Image.merge('RGBA',(r,g,b,a))
-pic.save("test1.png")
+def write_message(content, font_path,image_file, output_path):
+    image = Image.open(image_file)
+    image.load()
+    bands = image.split()
+    draw = ImageDraw.Draw(bands[0])
+    font = ImageFont.truetype(font_path, 20)
+    draw.text((10,10), content, font=font, fill="#ffffff")
+    picture = Image.merge('RGBA',bands)
+    picture.save(output_path)
+
+if __name__ == "__main__":
+    write_message("Hello", "/Library/Fonts/AmericanTypewriter.ttc", "test.png", "output_path.png")
