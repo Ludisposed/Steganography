@@ -11,25 +11,25 @@ OUT = []
 
 def encode_video(vid):
     global INP
-    frames, fps = vid.load_video()
+    frames, fps, aud = vid.load_video()
     new_frames = []
     for frame in frames:
         new_frame = steganography.hide_lsb(frame, None, text)
         new_frames.append(new_frame)
         INP.append(new_frame)
 
-    return new_frames, fps
+    return new_frames, fps, aud
 
 def decode_video(vid):
     global OUT
-    frames, fps = vid.load_video()
+    frames, fps,_ = vid.load_video()
     for frame in frames:
         OUT.append(frame)
         text = steganography.retrieve_lsb(frame, None)
         print(text)
 
-frames, fps = encode_video(vid)
-vid.save_video(frames, fps)
+frames, fps, aud = encode_video(vid)
+vid.save_video(frames, fps, aud)
 
 rev_vid = file_handler.VideoHandler('new_video.avi')
 decode_video(rev_vid)
