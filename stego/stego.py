@@ -1,7 +1,8 @@
-from helpers import steganography
 from helpers import encryption
 from helpers import file_handler
-
+from helpers import utility
+from helpers import (encrypt_image, encrypt_video, encrypt_audio, 
+                     decrypt_image, decrypt_video, decrypt_audio)
 import sys
 import os
 
@@ -15,7 +16,6 @@ text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(
 # Globals
 ENDBIT = [0] * 8
 
-#TODO Specify out filename
 def encrypt(filename, text, password, magic, rsa):
     '''
     A method that hide text into image
@@ -42,11 +42,21 @@ def encrypt(filename, text, password, magic, rsa):
     if rsa is None:
         text = text_ascii(text) + ENDBIT
 
-    #TODO Check for format and switch between Image, Video, (Audio... eventually)
-    image = file_handler.ImageHandler(filename)
-    d_old = image.load_image()
-    d_new = steganography.hide_lsb(d_old, magic, text)
-    image.save_image(d_new, 'new_' + image.filename)
+    encrypt_file = {
+        "image" : encrypt_image,
+        "video" : encrypt_video,
+        "audio" : encrypt_audio
+    }
+    file_type = utility.fileformat(filename)
+    
+    if file_type not in encrypt_file:
+        print("[-] ERROR:Unknown file format")
+        return
+        
+    encrypt_function = encrypt_file[file_type]
+    encrypt_function(filename, text, magic)
+        
+    
 
 #TODO Specify outfilename
 def decrypt(filename, password, magic, rsa):
@@ -62,13 +72,20 @@ def decrypt(filename, password, magic, rsa):
     Returns:
 	Text hided in image
     '''
-    
-    #TODO Check for format and switch between Image, Video, (Audio... eventually)
-    image = file_handler.ImageHandler(filename)
-    data = image.load_image()
-    text = steganography.retrieve_lsb(data, magic)
     print '[*] Decrypting text'
 
+    decrypt_file = {
+        "image" : decrypt_image,
+        "video" : decrypt_video,
+        "audio" : decrypt_audio
+    }
+    file_type = utility.fileformat(filename)
+    
+    if file_type not in decrypt_file:
+        print("[-] ERROR:Unknown file format")
+        return
+    decrypt_function = decrypt_file[file_type]
+    text = decrypt_function(filename, magic)
     if not password is None:
         text = encryption.decrypt_text(password, text)
     if not rsa is None:
