@@ -1,5 +1,0 @@
-1. Make movie not write everything for each frame
-2. Specify outputfilename
-3. Compress output of new video to make it less obvious
-4. Make --magic work for video
-5. Make Steganography work for Binary files
