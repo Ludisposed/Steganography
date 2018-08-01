@@ -1,3 +1,3 @@
-__all__ = ['stego'],
+__all__ = ['stego','helpers','tests'],
 __version__ = '1.0.0'
 

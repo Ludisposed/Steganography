@@ -1,8 +1,8 @@
 from helpers import encryption
 from helpers import file_handler
 from helpers import utility
-from helpers import (encrypt_image, encrypt_video, encrypt_audio, 
-                     decrypt_image, decrypt_video, decrypt_audio)
+from helpers import steganography 
+
 import sys
 import os
 
@@ -16,7 +16,7 @@ text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(
 # Globals
 ENDBIT = [0] * 8
 
-def encrypt(filename, text, password, magic, rsa):
+def encrypt(filename, output_filename, text, password, magic, rsa):
     '''
     A method that hide text into image
 
@@ -43,9 +43,9 @@ def encrypt(filename, text, password, magic, rsa):
         text = text_ascii(text) + ENDBIT
 
     encrypt_file = {
-        "image" : encrypt_image,
-        "video" : encrypt_video,
-        "audio" : encrypt_audio
+        "image" : steganography.encrypt_image,
+        "video" : steganography.encrypt_video,
+        "audio" : steganography.encrypt_audio
     }
     file_type = utility.fileformat(filename)
     
@@ -54,12 +54,12 @@ def encrypt(filename, text, password, magic, rsa):
         return
         
     encrypt_function = encrypt_file[file_type]
-    encrypt_function(filename, text, magic)
+    encrypt_function(filename, output_filename, text, magic)
         
     
 
 #TODO Specify outfilename
-def decrypt(filename, password, magic, rsa):
+def decrypt(filename, output_filename, password, magic, rsa):
     '''
     A method that decrypt text from image
 
@@ -75,9 +75,9 @@ def decrypt(filename, password, magic, rsa):
     print '[*] Decrypting text'
 
     decrypt_file = {
-        "image" : decrypt_image,
-        "video" : decrypt_video,
-        "audio" : decrypt_audio
+        "image" : steganography.decrypt_image,
+        "video" : steganography.decrypt_video,
+        "audio" : steganography.decrypt_audio
     }
     file_type = utility.fileformat(filename)
     
@@ -90,8 +90,11 @@ def decrypt(filename, password, magic, rsa):
         text = encryption.decrypt_text(password, text)
     if not rsa is None:
         text = encryption.decrypt_rsa(text, rsa)
-        
-    print '[*] Retrieved text: \n%s' % text
+
+    #print('[*] Retrieved text: \n%s' % text) 
+
+    with open(output_filename, "wb+") as f:
+        f.write('[*] Retrieved text: \n%s' % text)
     
 def parse_options():
     parser = argparse.ArgumentParser(usage='%(prog)s [options] <filename>',
@@ -121,6 +124,7 @@ python prng_stego.py --decrypt --password password --magic magic new_test.png
     parser.add_argument('-r','--rsa', type=str, help='encrypt using RSA [filename of key]')
     parser.add_argument('filename', type=str, help='encrypt/decrypt message into this [image/audio/video]')
     parser.add_argument('-t','--text', type=str, help='[text/text_path] used to encrypt')
+    parser.add_argument('-o','--output', type=str, help='specify outputfilename')
     args = parser.parse_args()
 
     if args.encrypt ^ args.decrypt == False:
@@ -134,7 +138,7 @@ python prng_stego.py --decrypt --password password --magic magic new_test.png
 if __name__ == "__main__":
     args = parse_options()
     if args.encrypt:
-        encrypt(args.filename, args.text, args.password, args.magic, args.rsa)
+        encrypt(args.filename, args.output, args.text, args.password, args.magic, args.rsa)
     else:
-        decrypt(args.filename, args.password, args.magic, args.rsa)
+        decrypt(args.filename, args.output, args.password, args.magic, args.rsa)
     

@@ -1,0 +1,9 @@
+[*] Retrieved text: 
+this is a file test
+the second line[*] Retrieved text: 
+this is a file test
+the second line[*] Retrieved text: 
+this is a file test
+the second line[*] Retrieved text: 
+this is a file test
+the second line

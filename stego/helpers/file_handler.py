@@ -1,8 +1,9 @@
 import os
-from PIL import Image
 import numpy as np
 import sys
 import moviepy.editor as mpy
+
+from PIL import Image
 
 class FileHandler(object):
     def __init__(self, filename):
@@ -22,7 +23,7 @@ class TextHandler(FileHandler):
     def trans_file_to_text(self):
     	textfile = os.path.join(self.path, self.filename)
     	if os.path.isfile(textfile) and os.path.exists(textfile):
-    	    with open(textfile, 'r') as f:
+    	    with open(textfile, 'rb') as f:
                     self.text = f.read()
 
 class ImageHandler(FileHandler):
