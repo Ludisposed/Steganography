@@ -1,0 +1,6 @@
+- [ ] Make movie not write everything for each frame
+- [ ] Specify outputfilename
+- [ ] Compress output of new video to make it less obvious
+- [ ] Make --magic work for video
+- [ ] Make Steganography work for Binary files
+- [ ] add compress algo init(huffenman/lzw)

@@ -65,4 +65,4 @@ class VideoHandler(FileHandler):
 
     def save_video(self, frames, fps, audio, outfilename):
         output = mpy.ImageSequenceClip(frames, fps=fps).set_audio(audio)
-        output.write_videofile(os.path.join(self.path, outfilename), codec="png")
+        output.write_videofile(os.path.join(self.path, outfilename))
