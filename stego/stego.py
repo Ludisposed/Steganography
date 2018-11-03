@@ -1,6 +1,11 @@
-from stego.helpers import steganography
-from stego.helpers import encryption
-from stego.helpers import file_handler
+try:
+    from stego.helpers import steganography
+    from stego.helpers import encryption
+    from stego.helpers import file_handler
+except:
+    from helpers import steganography
+    from helpers import encryption
+    from helpers import file_handler
 
 import sys
 import os
@@ -28,7 +33,7 @@ def encrypt(filename, text, password, magic, rsa):
     try:
         # Check for file!
         text = file_handler.TextHandler(text).text
-        print('[*] Encrypting text: \n\t{}'.format(text))
+        print('[*] Encrypting text: \n{}'.format(text))
 
         # Optional encrypt
         if not password is None:
@@ -36,8 +41,11 @@ def encrypt(filename, text, password, magic, rsa):
 
         if not rsa is None:
             text = encryption.encrypt_rsa(text, rsa)
-        
-        text = list(map(int, "".join("{:08b}".format(t) for t in text))) + ENDBIT
+
+        try:# python 3
+            text = list(map(int, "".join("{:08b}".format(t) for t in text))) + ENDBIT
+        except:# python 2
+            text = list(map(int, "".join("{:08b}".format(ord(t)) for t in text))) + ENDBIT
 
         image = file_handler.ImageHandler(filename)
         d_old = image.load_image()
@@ -46,7 +54,7 @@ def encrypt(filename, text, password, magic, rsa):
         d_new = steganography.hide_lsb(d_old, magic, text)
         image.save_image(d_new, 'new_' + image.filename)
     except encryption.EncryptError as e:
-        print(e)
+        print("[-] Error:{}".format(e))
     
 def decrypt(filename, password, magic, rsa):
     '''
@@ -78,10 +86,10 @@ def decrypt(filename, password, magic, rsa):
         if isinstance(text, bytes):
             text = text.decode("utf-8")
             
-        print('[*] Retrieved text: \n\t{}'.format(text))
+        print(u'[*] Retrieved text: \n{}'.format(text))
         return text
     except encryption.EncryptError as e:
-        print(e)
+        print("[-] Error:{}".format(e))
         return None
     
 def parse_options():
