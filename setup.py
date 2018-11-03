@@ -19,7 +19,7 @@ def get_version():
 
 
 setup(
-	name='stego',                      
+	name='stego_prng',                      
 	version=get_version(),
     author="Ludisposed&Qin",
     description="Steganography prng-Tool",
