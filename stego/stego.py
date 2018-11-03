@@ -1,6 +1,6 @@
-from helpers import steganography
-from helpers import encryption
-from helpers import file_handler
+from stego.helpers import steganography
+from stego.helpers import encryption
+from stego.helpers import file_handler
 
 import sys
 import os
@@ -8,9 +8,6 @@ import os
 import numpy as np
 from PIL import Image
 import argparse
-
-# Gets ascii representation from string to list of bits
-text_ascii = lambda text: map(int, ''.join(map(lambda char: '{:08b}'.format(ord(char)), text)))
 
 # Globals
 ENDBIT = [0] * 8
@@ -28,26 +25,28 @@ def encrypt(filename, text, password, magic, rsa):
     Returns:
         A image named new + filename, which with encrypted text in it
     '''
-    # Check for file!
-    text = file_handler.TextHandler(text).text
-    print '[*] Encrypting text'
+    try:
+        # Check for file!
+        text = file_handler.TextHandler(text).text
+        print('[*] Encrypting text: \n\t{}'.format(text))
 
-    # Optional encrypt
-    if not password is None:
-        text = encryption.encrypt_text(password, text)
+        # Optional encrypt
+        if not password is None:
+            text = encryption.encrypt_fernet(password, text)
 
-    if not rsa is None:
-        text = encryption.check_rsa_key(text, rsa) + ENDBIT
-    
-    if rsa is None:
-        text = text_ascii(text) + ENDBIT
+        if not rsa is None:
+            text = encryption.encrypt_rsa(text, rsa)
+        
+        text = list(map(int, "".join("{:08b}".format(t) for t in text))) + ENDBIT
 
-    image = file_handler.ImageHandler(filename)
-    d_old = image.load_image()
-       
-    # get new data and save to image
-    d_new = steganography.hide_lsb(d_old, magic, text)
-    image.save_image(d_new, 'new_' + image.filename)
+        image = file_handler.ImageHandler(filename)
+        d_old = image.load_image()
+           
+        # get new data and save to image
+        d_new = steganography.hide_lsb(d_old, magic, text)
+        image.save_image(d_new, 'new_' + image.filename)
+    except encryption.EncryptError as e:
+        print(e)
     
 def decrypt(filename, password, magic, rsa):
     '''
@@ -61,22 +60,29 @@ def decrypt(filename, password, magic, rsa):
     Returns:
 	Text hided in image
     '''
-    
-    image = file_handler.ImageHandler(filename)
-    # Load image
-    data = image.load_image()
+    try:
+        image = file_handler.ImageHandler(filename)
+        # Load image
+        data = image.load_image()
 
-    # Retrieve text
-    text = steganography.retrieve_lsb(data, magic)
-    print '[*] Decrypting text'
+        # Retrieve text
+        text = steganography.retrieve_lsb(data, magic)
+        print('[*] Decrypting text')
 
-    # Optional Decrypt
-    if not password is None:
-        text = encryption.decrypt_text(password, text)
-    if not rsa is None:
-        text = encryption.decrypt_rsa(text, rsa)
-        
-    print '[*] Retrieved text: \n%s' % text
+        # Optional Decrypt
+        if not password is None:
+            text = encryption.decrypt_fernet(password, text)
+        if not rsa is None:
+            text = encryption.decrypt_rsa(text, rsa)
+
+        if isinstance(text, bytes):
+            text = text.decode("utf-8")
+            
+        print('[*] Retrieved text: \n\t{}'.format(text))
+        return text
+    except encryption.EncryptError as e:
+        print(e)
+        return None
     
 def parse_options():
     parser = argparse.ArgumentParser(usage='%(prog)s [options] <filename>',

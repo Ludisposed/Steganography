@@ -2,9 +2,6 @@ import random
 import numpy as np
 
 
-ascii_text = lambda byte_char: chr(int(byte_char, 2))
-
-
 def hide_lsb(data, magic, text):
     '''
     A method that hides the least significant bits of the picture with text
@@ -17,7 +14,7 @@ def hide_lsb(data, magic, text):
     Returns:
         The list representation of the image with text hidden in random lsb's
     '''
-    print '[*] Hiding message in image'
+    print('[*] Hiding message in image')
 
     if not magic is None:
         insert_fake_data(data)
@@ -31,7 +28,7 @@ def hide_lsb(data, magic, text):
         for i in range(len(text)):
             data.flat[i] = (data.flat[i] & ~1) | text[i]
     
-    print '[*] Finished hiding the message'
+    print('[*] Finished hiding the message')
     return data
 
 def retrieve_lsb(data, magic):
@@ -45,7 +42,7 @@ def retrieve_lsb(data, magic):
     Returns:
         The list representation of the image with retrieved text from random lsb's
     '''
-    print '[*] Retrieving message from image'
+    print('[*] Retrieving message from image')
 
     retrieve_range = range(data.size)
     if not magic is None:
@@ -60,30 +57,29 @@ def retrieve(data, retrieve_range):
             temp_char += str(data.flat[i] & 1)
             if len(temp_char) == 8:
                 if int(temp_char) == 0:
-                    print '[*] Finished retrieving'
+                    print('[*] Finished retrieving')
                     return output
-                output += ascii_text(temp_char)
+                output += chr(int(temp_char, 2))
                 temp_char = ''
-    print '[*] Retrieving the message has failed'
+    print('[*] Retrieving the message has failed')
     return ''
 
 def generate_seed(magic):
     seed = 1
     for char in magic:
         seed *= ord(char)
-    print '[*] Your magic number is %d' % seed
+    print('[*] Your magic number is {}'.format(seed))
     return seed
 
-
 def random_ints(size, start=0):
-    random_numbers = range(start, size)
+    random_numbers = list(range(start, size))
     random.shuffle(random_numbers)
     for random_num in random_numbers:
         yield random_num
 
 
 def insert_fake_data(data):
-    print '[*] Inserting fake data'
+    print('[*] Inserting fake data')
     for i in random_ints(data.size):
         data.flat[i] = (data.flat[i] & ~1) | random.randint(0,1)
-    print '[*] Done inserting fake data'
+    print('[*] Done inserting fake data')

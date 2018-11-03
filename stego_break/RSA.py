@@ -31,7 +31,7 @@ ciphertext = public_key.encrypt(
 )
 
 # Encrypted text
-print ciphertext
+print(ciphertext)
 
 # Decrypt
 plaintext = private_key.decrypt(
