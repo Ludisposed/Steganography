@@ -17,11 +17,14 @@ def get_version():
     version, = re.findall(pattern, init_py)
     return version
 
-def install():
-	setup(
-		name='stego',                      
-		version=get_version(),                    
-		packages = find_packages(exlude('stego_test.py')),
-		scripts=['stego'],
-		install_requires=['Pillow', 'cryptography', 'numpy'],             
-      )
+
+setup(
+	name='stego',                      
+	version=get_version(),
+    author="Ludisposed&Qin",
+    description="Steganography prng-Tool",
+    url="https://github.com/Ludisposed/Steganography",             
+	packages=find_packages(),
+	install_requires=['Pillow', 'cryptography', 'numpy'],
+    license="MIT license",         
+  )

@@ -1,18 +1,14 @@
-try:
-    from stego.helpers import steganography
-    from stego.helpers import encryption
-    from stego.helpers import file_handler
-except:
-    from helpers import steganography
-    from helpers import encryption
-    from helpers import file_handler
-
 import sys
 import os
 
 import numpy as np
 from PIL import Image
 import argparse
+
+try:
+    from stego.helpers import steganography, encryption, file_handler
+except:
+    from helpers import steganography, encryption, file_handler
 
 # Globals
 ENDBIT = [0] * 8
