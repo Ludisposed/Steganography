@@ -12,7 +12,7 @@ def get_file(*paths):
         pass
 
 def get_version():
-    init_py = get_file(os.path.dirname(__file__), 'stego', '__init__.py')
+    init_py = get_file(os.path.dirname(__file__), 'stegoprng', '__init__.py')
     pattern = r"{0}\W*=\W*'([^']+)'".format('__version__')
     version, = re.findall(pattern, init_py)
     return version

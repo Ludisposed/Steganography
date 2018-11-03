@@ -6,7 +6,7 @@ from PIL import Image
 import argparse
 
 try:
-    from stego.helpers import steganography, encryption, file_handler
+    from stegoprng.helpers import steganography, encryption, file_handler
 except:
     from helpers import steganography, encryption, file_handler
 

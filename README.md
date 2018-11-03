@@ -1,6 +1,10 @@
 # Steganography
 Steganography is the art of hiding messages in (images, videos or even audio)
 
+# Install from pip
+
+`pip install stegoprng`
+
 # Prerequisites
 It uses the `PIL`, `numpy` and `cryptography` modules
 
