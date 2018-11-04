@@ -1,10 +1,6 @@
-import unittest
 import os
-
-import sys
-sys.path.append("..")
-
-from stego import stego
+import unittest
+from stegoprng import stego
 
 _cwd = os.getcwd()
 ENCRYPT_IMAGE = os.path.join(_cwd, 'test.png')
