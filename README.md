@@ -15,7 +15,7 @@ run `python stego.py --help`
 
 ## Example
 
-```
+```python
 from stegoprng import stego
 
 encrypt_image_path = "test.png" #hide information to this image
